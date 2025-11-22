@@ -89,7 +89,7 @@ export default function LoginPageClient() {
                 autoComplete="email"
                 className={`mt-1 block w-full px-3 py-2 border ${
                   errors.email ? "border-red-500" : "border-gray-300"
-                } rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-colors`}
+                } rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-colors text-black`}
                 placeholder="you@example.com"
                 {...register("email", { required: "Email is required" })}
               />
@@ -112,7 +112,7 @@ export default function LoginPageClient() {
                 autoComplete="current-password"
                 className={`mt-1 block w-full px-3 py-2 border ${
                   errors.password ? "border-red-500" : "border-gray-300"
-                } rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-colors`}
+                } rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-colors text-black`}
                 placeholder="••••••••"
                 {...register("password", { required: "Password is required" })}
               />
