@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { authService } from "@/app/services/auth.service";
+import { useAuth } from "@/app/context/AuthContext";
 import { RegisterDto } from "@/app/types/auth";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -22,17 +23,19 @@ export default function RegisterPageClient() {
     formState: { errors, isSubmitting },
   } = useForm<RegisterInputs>();
 
+  const { register: registerUser } = useAuth();
+
   const onSubmit: SubmitHandler<RegisterInputs> = async (data) => {
     setRegisterError(null);
     try {
       // Exclude confirmPassword from the API call
       const { confirmPassword, ...registerData } = data;
-      await authService.register(registerData);
+      await registerUser(registerData);
 
       // Redirect to login or auto-login
       console.log("Registration successful");
       toast.success("Registration successful! Please log in.");
-      router.push("/login");
+      // router.push("/login"); // register function already handles redirect
     } catch (error: any) {
       console.error("Registration failed", error);
       if (

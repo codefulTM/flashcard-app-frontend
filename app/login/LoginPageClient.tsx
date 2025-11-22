@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { authService } from "@/app/services/auth.service";
+import { useAuth } from "@/app/context/AuthContext";
 import { LoginDto } from "@/app/types/auth";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -21,21 +22,19 @@ export default function LoginPageClient() {
     formState: { errors, isSubmitting },
   } = useForm<LoginInputs>();
 
+  const { login } = useAuth();
+
   const onSubmit: SubmitHandler<LoginInputs> = async (data) => {
     setLoginError(null);
     try {
-      const response = await authService.login({
+      await login({
         email: data.email,
         password: data.password,
       });
 
-      // Store token
-      localStorage.setItem("accessToken", response.accessToken);
-
-      // Redirect to dashboard or home
-      console.log("Login successful", response);
+      console.log("Login successful");
       toast.success("Login successful!");
-      router.push("/");
+      // router.push("/"); // login function already handles redirect
     } catch (error: any) {
       console.error("Login failed", error);
       if (
