@@ -6,6 +6,7 @@ import { authService } from "@/app/services/auth.service";
 import { RegisterDto } from "@/app/types/auth";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "react-hot-toast";
 
 interface RegisterInputs extends RegisterDto {
   confirmPassword: string;
@@ -30,6 +31,7 @@ export default function RegisterPageClient() {
 
       // Redirect to login or auto-login
       console.log("Registration successful");
+      toast.success("Registration successful! Please log in.");
       router.push("/login");
     } catch (error: any) {
       console.error("Registration failed", error);

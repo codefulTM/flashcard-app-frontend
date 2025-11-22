@@ -6,6 +6,7 @@ import { authService } from "@/app/services/auth.service";
 import { LoginDto } from "@/app/types/auth";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "react-hot-toast";
 
 interface LoginInputs extends LoginDto {
   rememberMe: boolean;
@@ -33,6 +34,7 @@ export default function LoginPageClient() {
 
       // Redirect to dashboard or home
       console.log("Login successful", response);
+      toast.success("Login successful!");
       router.push("/");
     } catch (error: any) {
       console.error("Login failed", error);
