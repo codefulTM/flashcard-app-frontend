@@ -9,10 +9,13 @@ import CreateDeckModal from "./CreateDeckModal";
 import { CreateDeckDto } from "@/app/types/deck";
 import { toast } from "react-hot-toast";
 
+import DeckOptionsDropdown from "./DeckOptionsDropdown";
+
 export default function DeckPageClient() {
   const { user } = useAuth();
   const [decks, setDecks] = useState<Deck[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -40,6 +43,40 @@ export default function DeckPageClient() {
     }
   };
 
+  const toggleDropdown = (deckId: string) => {
+    if (activeDropdownId === deckId) {
+      setActiveDropdownId(null);
+    } else {
+      setActiveDropdownId(deckId);
+    }
+  };
+
+  const handleUpdate = (deckId: string) => {
+    console.log("Update deck", deckId);
+    setActiveDropdownId(null);
+    // TODO: Implement update logic
+  };
+
+  const handleBrowse = (deckId: string) => {
+    console.log("Browse deck", deckId);
+    setActiveDropdownId(null);
+    // TODO: Implement browse logic
+  };
+
+  const handleDelete = async (deckId: string) => {
+    if (confirm("Are you sure you want to delete this deck?")) {
+      try {
+        await deckService.deleteDeck(deckId);
+        setDecks(decks.filter((d) => d.id !== deckId));
+        toast.success("Deck deleted successfully");
+      } catch (error) {
+        console.error("Failed to delete deck", error);
+        toast.error("Failed to delete deck");
+      }
+    }
+    setActiveDropdownId(null);
+  };
+
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-6 text-indigo-700">Your Decks</h1>
@@ -56,7 +93,13 @@ export default function DeckPageClient() {
             className="relative flex flex-col justify-between p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow w-48 h-48"
             key={deck.id}
           >
-            <button className="absolute top-2 right-2 p-1 text-gray-400 hover:text-gray-700 transition-colors">
+            <button
+              className="absolute top-2 right-2 p-1 text-gray-400 hover:text-gray-700 transition-colors"
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleDropdown(deck.id);
+              }}
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -72,6 +115,13 @@ export default function DeckPageClient() {
                 />
               </svg>
             </button>
+            <DeckOptionsDropdown
+              isOpen={activeDropdownId === deck.id}
+              onClose={() => setActiveDropdownId(null)}
+              onUpdate={() => handleUpdate(deck.id)}
+              onBrowse={() => handleBrowse(deck.id)}
+              onDelete={() => handleDelete(deck.id)}
+            />
             <h2 className="text-xl font-semibold text-gray-900 truncate">
               {deck.name}
             </h2>
