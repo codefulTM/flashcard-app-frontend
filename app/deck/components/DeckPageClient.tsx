@@ -10,11 +10,17 @@ import { CreateDeckDto } from "@/app/types/deck";
 import { toast } from "react-hot-toast";
 
 import DeckOptionsDropdown from "./DeckOptionsDropdown";
+import UpdateDeckModal from "./UpdateDeckModal";
+import { UpdateDeckDto } from "@/app/types/deck";
+import { useRouter } from "next/navigation";
 
 export default function DeckPageClient() {
   const { user } = useAuth();
+  const router = useRouter();
   const [decks, setDecks] = useState<Deck[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [selectedDeck, setSelectedDeck] = useState<Deck | null>(null);
   const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -43,6 +49,17 @@ export default function DeckPageClient() {
     }
   };
 
+  const handleUpdateDeck = async (id: string, data: UpdateDeckDto) => {
+    try {
+      const updatedDeck = await deckService.updateDeck(id, data);
+      setDecks(decks.map((d) => (d.id === id ? updatedDeck : d)));
+      toast.success("Deck updated successfully!");
+    } catch (error) {
+      console.error("Failed to update deck", error);
+      throw error;
+    }
+  };
+
   const toggleDropdown = (deckId: string) => {
     if (activeDropdownId === deckId) {
       setActiveDropdownId(null);
@@ -52,15 +69,19 @@ export default function DeckPageClient() {
   };
 
   const handleUpdate = (deckId: string) => {
-    console.log("Update deck", deckId);
+    const deckToUpdate = decks.find((d) => d.id === deckId);
+    if (deckToUpdate) {
+      setSelectedDeck(deckToUpdate);
+      setIsUpdateModalOpen(true);
+    }
     setActiveDropdownId(null);
-    // TODO: Implement update logic
   };
 
   const handleBrowse = (deckId: string) => {
     console.log("Browse deck", deckId);
     setActiveDropdownId(null);
     // TODO: Implement browse logic
+    router.push(`/deck/${deckId}`);
   };
 
   const handleDelete = async (deckId: string) => {
@@ -135,6 +156,12 @@ export default function DeckPageClient() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleCreateDeck}
+      />
+      <UpdateDeckModal
+        isOpen={isUpdateModalOpen}
+        onClose={() => setIsUpdateModalOpen(false)}
+        onSubmit={handleUpdateDeck}
+        deck={selectedDeck}
       />
     </div>
   );
