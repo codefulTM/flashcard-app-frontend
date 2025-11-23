@@ -5,18 +5,40 @@ import { useEffect, useState } from "react";
 import { Deck } from "@/app/types/deck";
 import { deckService } from "@/app/services/deck.service";
 
+import CreateDeckModal from "./CreateDeckModal";
+import { CreateDeckDto } from "@/app/types/deck";
+import { toast } from "react-hot-toast";
+
 export default function DeckPageClient() {
   const { user } = useAuth();
   const [decks, setDecks] = useState<Deck[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     if (!user) return;
     const fetchDecks = async () => {
-      const decks = await deckService.getDecks(user.id);
-      setDecks(decks);
+      try {
+        const decks = await deckService.getDecks(user.id);
+        setDecks(decks);
+      } catch (error) {
+        console.error("Failed to fetch decks", error);
+        toast.error("Failed to load decks");
+      }
     };
     fetchDecks();
   }, [user]);
+
+  const handleCreateDeck = async (data: CreateDeckDto) => {
+    if (!user) return;
+    try {
+      const newDeck = await deckService.createDeck(data, user.id);
+      setDecks([...decks, newDeck]);
+      toast.success("Deck created successfully!");
+    } catch (error) {
+      console.error("Failed to create deck", error);
+      throw error; // Re-throw to be handled by the modal
+    }
+  };
 
   return (
     <div className="container mx-auto p-4">
@@ -24,7 +46,7 @@ export default function DeckPageClient() {
       <div className="flex flex-wrap gap-4">
         <button
           className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-blue-500 hover:text-blue-600 transition-colors w-48 h-48"
-          onClick={() => alert("Add new deck functionality coming soon!")}
+          onClick={() => setIsModalOpen(true)}
         >
           <span className="text-5xl">+</span>
           <span className="mt-2 text-lg">New Deck</span>
@@ -53,12 +75,17 @@ export default function DeckPageClient() {
             <h2 className="text-xl font-semibold text-gray-900 truncate">
               {deck.name}
             </h2>
-            <button className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors self-end">
+            <button className="mt-4 mx-auto w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors self-end">
               Learn
             </button>
           </div>
         ))}
       </div>
+      <CreateDeckModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleCreateDeck}
+      />
     </div>
   );
 }
