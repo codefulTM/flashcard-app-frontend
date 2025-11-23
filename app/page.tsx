@@ -25,7 +25,7 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row justify-center gap-4 pt-4">
             {user ? (
               <Link
-                href="/decks"
+                href="/deck"
                 className="px-8 py-4 bg-indigo-600 text-white rounded-full font-bold text-lg shadow-lg hover:bg-indigo-700 hover:shadow-xl hover:scale-105 transition-all duration-200"
               >
                 Go to My Decks

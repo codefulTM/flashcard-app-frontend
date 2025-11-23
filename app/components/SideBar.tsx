@@ -13,7 +13,7 @@ export default function SideBar() {
   }
 
   return (
-    <aside className="w-64 bg-gray-800 text-white p-4 min-h-screen">
+    <aside className="w-64 fixed bg-gray-800 text-white p-4 min-h-screen">
       <nav>
         <ul className="space-y-2">
           <li>
@@ -26,7 +26,7 @@ export default function SideBar() {
           </li>
           <li>
             <Link
-              href="/decks"
+              href="/deck"
               className="block py-2 px-4 rounded hover:bg-gray-700 transition-colors duration-200"
             >
               Decks
@@ -36,7 +36,7 @@ export default function SideBar() {
             <li>
               <button
                 onClick={() => logout()}
-                className="w-full text-left block py-2 px-4 rounded hover:bg-gray-700 transition-colors duration-200"
+                className="cursor-pointer w-full text-left block py-2 px-4 rounded hover:bg-gray-700 transition-colors duration-200"
               >
                 Logout
               </button>

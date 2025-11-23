@@ -1,0 +1,64 @@
+"use client";
+
+import { useAuth } from "@/app/context/AuthContext";
+import { useEffect, useState } from "react";
+import { Deck } from "@/app/types/deck";
+import { deckService } from "@/app/services/deck.service";
+
+export default function DeckPageClient() {
+  const { user } = useAuth();
+  const [decks, setDecks] = useState<Deck[]>([]);
+
+  useEffect(() => {
+    if (!user) return;
+    const fetchDecks = async () => {
+      const decks = await deckService.getDecks(user.id);
+      setDecks(decks);
+    };
+    fetchDecks();
+  }, [user]);
+
+  return (
+    <div className="container mx-auto p-4">
+      <h1 className="text-3xl font-bold mb-6 text-indigo-700">Your Decks</h1>
+      <div className="flex flex-wrap gap-4">
+        <button
+          className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-blue-500 hover:text-blue-600 transition-colors w-48 h-48"
+          onClick={() => alert("Add new deck functionality coming soon!")}
+        >
+          <span className="text-5xl">+</span>
+          <span className="mt-2 text-lg">New Deck</span>
+        </button>
+        {decks.map((deck) => (
+          <div
+            className="relative flex flex-col justify-between p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow w-48 h-48"
+            key={deck.id}
+          >
+            <button className="absolute top-2 right-2 p-1 text-gray-400 hover:text-gray-700 transition-colors">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-6 h-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM12.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM18.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
+                />
+              </svg>
+            </button>
+            <h2 className="text-xl font-semibold text-gray-900 truncate">
+              {deck.name}
+            </h2>
+            <button className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors self-end">
+              Learn
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
