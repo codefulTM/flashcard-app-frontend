@@ -1,6 +1,7 @@
 "use client";
 
 import DeckBrowser from "./DeckBrowser";
+
 import { useState, useEffect } from "react";
 import FlashcardAdder from "./FlashcardAdder";
 import { Flashcard } from "@/app/types/flashcard";
@@ -45,6 +46,17 @@ export default function DeckPageClient({ id }: { id: string }) {
     setPage(1); // Reset to first page on new search
   };
 
+  const handleFlashcardUpdate = (updatedFlashcard: Flashcard) => {
+    setFlashcards((prev) =>
+      prev.map((f) => (f.id === updatedFlashcard.id ? updatedFlashcard : f))
+    );
+  };
+
+  const handleFlashcardDelete = (flashcardId: string) => {
+    setFlashcards((prev) => prev.filter((f) => f.id !== flashcardId));
+    setTotal((prev) => prev - 1);
+  };
+
   return (
     <div className="h-screen flex flex-col overflow-hidden">
       <ul className="flex border-b border-gray-200 mb-4 h-10 z-50 sticky top-0 bg-white flex-shrink-0">
@@ -78,6 +90,8 @@ export default function DeckPageClient({ id }: { id: string }) {
             limit={limit}
             onPageChange={setPage}
             onSearch={handleSearch}
+            onFlashcardUpdate={handleFlashcardUpdate}
+            onFlashcardDelete={handleFlashcardDelete}
           />
         )}
         {mode === "add" && (

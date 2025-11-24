@@ -146,7 +146,13 @@ export default function DeckPageClient() {
             <h2 className="text-xl font-semibold text-gray-900 truncate">
               {deck.name}
             </h2>
-            <button className="mt-4 mx-auto w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors self-end">
+            <button
+              className="mt-4 mx-auto w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors self-end"
+              onClick={(e) => {
+                e.stopPropagation();
+                router.push(`/deck/${deck.id}/review`);
+              }}
+            >
               Learn
             </button>
           </div>

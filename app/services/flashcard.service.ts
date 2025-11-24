@@ -3,6 +3,7 @@ import {
   CreateFlashcardDto,
   Flashcard,
   UpdateFlashcardDto,
+  ReviewFlashcardDto,
 } from "../types/flashcard";
 
 export const flashcardService = {
@@ -54,6 +55,30 @@ export const flashcardService = {
       deck_id: deckId,
       front_content: frontContent,
     });
+    return response.data;
+  },
+
+  async reviewFlashcard(
+    id: string,
+    data: ReviewFlashcardDto
+  ): Promise<Flashcard> {
+    const response = await apiClient.post<Flashcard>(
+      `/flashcards/${id}/review`,
+      data
+    );
+    return response.data;
+  },
+
+  async getDueFlashcards(
+    deckId: string,
+    limit: number = 20
+  ): Promise<Flashcard[]> {
+    const response = await apiClient.get<Flashcard[]>(
+      `/flashcards/deck/${deckId}/due`,
+      {
+        params: { limit },
+      }
+    );
     return response.data;
   },
 };

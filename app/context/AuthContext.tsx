@@ -14,7 +14,7 @@ import { LoginDto, RegisterDto, User } from "../types/auth";
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: (data: LoginDto) => Promise<void>;
+  login: (data: LoginDto, returnUrl?: string) => Promise<void>;
   register: (data: RegisterDto) => Promise<void>;
   logout: () => void;
 }
@@ -58,6 +58,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const payload = JSON.parse(jsonPayload);
         console.log("Decoded payload:", payload);
 
+        // Check if token is expired
+        if (payload.exp && Date.now() >= payload.exp * 1000) {
+          throw new Error("Token expired");
+        }
+
         setUser({
           id: payload.sub, // Assuming 'sub' is id
           email: payload.email,
@@ -74,12 +79,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setLoading(false);
   };
 
-  const login = async (data: LoginDto) => {
+  const login = async (data: LoginDto, returnUrl: string = "/") => {
     try {
       const response = await authService.login(data);
       localStorage.setItem("accessToken", response.accessToken);
       await checkAuth();
-      router.push("/");
+      router.push(returnUrl);
     } catch (error) {
       console.error("Login failed", error);
       throw error;

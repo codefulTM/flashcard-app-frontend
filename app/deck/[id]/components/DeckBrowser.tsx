@@ -1,6 +1,9 @@
 import { Flashcard } from "@/app/types/flashcard";
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
+import { flashcardService } from "@/app/services/flashcard.service";
+import { toast } from "react-hot-toast";
+import { useForm, SubmitHandler } from "react-hook-form";
 
 interface DeckBrowserProps {
   flashcards: Flashcard[];
@@ -9,6 +12,13 @@ interface DeckBrowserProps {
   limit: number;
   onPageChange: (page: number) => void;
   onSearch: (query: string) => void;
+  onFlashcardUpdate: (updatedFlashcard: Flashcard) => void;
+  onFlashcardDelete: (flashcardId: string) => void;
+}
+
+interface UpdateFlashcardFormData {
+  front_content: string;
+  back_content: string;
 }
 
 export default function DeckBrowser({
@@ -18,11 +28,23 @@ export default function DeckBrowser({
   limit,
   onPageChange,
   onSearch,
+  onFlashcardUpdate,
+  onFlashcardDelete,
 }: DeckBrowserProps) {
   const [selectedFlashcard, setSelectedFlashcard] = useState<Flashcard | null>(
     null
   );
   const [searchQuery, setSearchQuery] = useState("");
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm<UpdateFlashcardFormData>();
 
   const totalPages = Math.ceil(total / limit);
 
@@ -31,8 +53,146 @@ export default function DeckBrowser({
     onSearch(searchQuery);
   };
 
+  const handleUpdateClick = () => {
+    if (selectedFlashcard) {
+      setValue("front_content", selectedFlashcard.front_content);
+      setValue("back_content", selectedFlashcard.back_content);
+      setIsUpdateModalOpen(true);
+      setIsMenuOpen(false);
+    }
+  };
+
+  const onSubmit: SubmitHandler<UpdateFlashcardFormData> = async (data) => {
+    if (!selectedFlashcard) return;
+
+    try {
+      const updated = await flashcardService.updateFlashcard(
+        selectedFlashcard.id,
+        data
+      );
+      onFlashcardUpdate(updated);
+      setSelectedFlashcard(updated);
+      setIsUpdateModalOpen(false);
+      toast.success("Flashcard updated successfully");
+    } catch (error) {
+      console.error("Failed to update flashcard", error);
+      toast.error("Failed to update flashcard");
+    }
+  };
+
+  const handleDeleteClick = () => {
+    setIsDeleteModalOpen(true);
+    setIsMenuOpen(false);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!selectedFlashcard) return;
+
+    try {
+      await flashcardService.deleteFlashcard(selectedFlashcard.id);
+      onFlashcardDelete(selectedFlashcard.id);
+      setSelectedFlashcard(null);
+      setIsDeleteModalOpen(false);
+      toast.success("Flashcard deleted successfully");
+    } catch (error) {
+      console.error("Failed to delete flashcard", error);
+      toast.error("Failed to delete flashcard");
+    }
+  };
+
   return (
     <div className="flex h-full">
+      {isUpdateModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-2xl">
+            <h3 className="text-xl font-bold mb-4 text-black">
+              Update Flashcard
+            </h3>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Front Content
+                </label>
+                <textarea
+                  {...register("front_content", {
+                    required: "Front content is required",
+                  })}
+                  className={`w-full p-2 text-black border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-h-[100px] ${
+                    errors.front_content ? "border-red-500" : "border-gray-300"
+                  }`}
+                />
+                {errors.front_content && (
+                  <p className="mt-1 text-sm text-red-600">
+                    {errors.front_content.message}
+                  </p>
+                )}
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Back Content (Markdown supported)
+                </label>
+                <textarea
+                  {...register("back_content", {
+                    required: "Back content is required",
+                  })}
+                  className={`w-full p-2 text-black border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-h-[200px] ${
+                    errors.back_content ? "border-red-500" : "border-gray-300"
+                  }`}
+                />
+                {errors.back_content && (
+                  <p className="mt-1 text-sm text-red-600">
+                    {errors.back_content.message}
+                  </p>
+                )}
+              </div>
+              <div className="flex justify-end gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setIsUpdateModalOpen(false)}
+                  className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700"
+                >
+                  Update
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+      {isDeleteModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
+            <h3 className="text-xl font-bold mb-4 text-black">
+              Delete Flashcard
+            </h3>
+            <p className="text-gray-700 mb-6">
+              Are you sure you want to delete this flashcard? This action cannot
+              be undone.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setIsDeleteModalOpen(false)}
+                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteConfirm}
+                className="px-4 py-2 text-white bg-red-600 rounded-md hover:bg-red-700"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <aside className="w-1/3 p-6 border-r border-gray-200 bg-gray-50 flex flex-col">
         <h2 className="text-2xl font-bold mb-6 text-gray-800">Flashcards</h2>
 
@@ -105,22 +265,45 @@ export default function DeckBrowser({
           <h2 className="text-2xl font-bold text-gray-800">
             Flashcard Details
           </h2>
-          <button className="p-2 rounded-full hover:bg-gray-100 transition-colors duration-200 text-gray-600">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+          <div className="relative">
+            <button
+              disabled={!selectedFlashcard}
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="p-2 rounded-full hover:bg-gray-100 transition-colors duration-200 text-gray-600"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
-              />
-            </svg>
-          </button>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
+                />
+              </svg>
+            </button>
+
+            {isMenuOpen && (
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 border border-gray-200">
+                <button
+                  className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  onClick={handleUpdateClick}
+                >
+                  Update
+                </button>
+                <button
+                  className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                  onClick={handleDeleteClick}
+                >
+                  Delete
+                </button>
+              </div>
+            )}
+          </div>
         </div>
         {selectedFlashcard ? (
           <div className="flex-grow flex flex-col justify-center items-center p-8 bg-gray-50 border border-gray-200 rounded-lg shadow-inner text-center">
@@ -131,7 +314,9 @@ export default function DeckBrowser({
             </div>
             <div className="p-6 bg-white rounded-lg shadow-md max-w-xl w-full text-left">
               <div className="text-xl text-gray-700 leading-relaxed prose prose-blue max-w-none">
-                <ReactMarkdown>{selectedFlashcard.back_content}</ReactMarkdown>
+                <ReactMarkdown>
+                  {selectedFlashcard.back_content.replace(/\n/g, "  \n")}
+                </ReactMarkdown>
               </div>
             </div>
           </div>

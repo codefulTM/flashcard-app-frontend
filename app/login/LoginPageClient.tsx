@@ -6,7 +6,7 @@ import { authService } from "@/app/services/auth.service";
 import { useAuth } from "@/app/context/AuthContext";
 import { LoginDto } from "@/app/types/auth";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "react-hot-toast";
 
 interface LoginInputs extends LoginDto {
@@ -15,6 +15,8 @@ interface LoginInputs extends LoginDto {
 
 export default function LoginPageClient() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const returnUrl = searchParams.get("returnUrl") || "/";
   const [loginError, setLoginError] = useState<string | null>(null);
   const {
     register,
@@ -27,14 +29,16 @@ export default function LoginPageClient() {
   const onSubmit: SubmitHandler<LoginInputs> = async (data) => {
     setLoginError(null);
     try {
-      await login({
-        email: data.email,
-        password: data.password,
-      });
+      await login(
+        {
+          email: data.email,
+          password: data.password,
+        },
+        returnUrl
+      );
 
       console.log("Login successful");
       toast.success("Login successful!");
-      // router.push("/"); // login function already handles redirect
     } catch (error: any) {
       console.error("Login failed", error);
       if (
