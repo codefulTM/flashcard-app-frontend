@@ -146,6 +146,31 @@ export default function DeckPageClient() {
             <h2 className="text-xl font-semibold text-gray-900 truncate">
               {deck.name}
             </h2>
+            <p className="text-sm text-gray-500 mt-2">
+              {deck.next_review_at
+                ? (() => {
+                    const date = new Date(deck.next_review_at);
+                    const now = new Date();
+                    const diff = date.getTime() - now.getTime();
+
+                    if (diff <= 0)
+                      return (
+                        <span className="text-green-600 font-medium">
+                          Cards due now!
+                        </span>
+                      );
+
+                    const minutes = Math.floor(diff / 60000);
+                    if (minutes < 60) return `Next review in ${minutes}m`;
+
+                    const hours = Math.floor(minutes / 60);
+                    if (hours < 24) return `Next review in ${hours}h`;
+
+                    const days = Math.floor(hours / 24);
+                    return `Next review in ${days}d`;
+                  })()
+                : "No cards due"}
+            </p>
             <button
               className="mt-4 mx-auto w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors self-end"
               onClick={(e) => {

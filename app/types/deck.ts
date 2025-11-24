@@ -7,6 +7,7 @@ export interface Deck {
   user_id: string;
   created_at: string;
   updated_at: string;
+  next_review_at?: string;
 }
 
 export interface CreateDeckDto {

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Flashcard } from "@/app/types/flashcard";
+import { deckService } from "@/app/services/deck.service";
 import { flashcardService } from "@/app/services/flashcard.service";
 import { toast } from "react-hot-toast";
 import ReactMarkdown from "react-markdown";
@@ -22,6 +23,7 @@ export default function FlashcardReviewer({ deckId }: FlashcardReviewerProps) {
     good: 0,
     easy: 0,
   });
+  const [nextReviewDate, setNextReviewDate] = useState<string | null>(null);
 
   useEffect(() => {
     loadDueFlashcards();
@@ -32,6 +34,12 @@ export default function FlashcardReviewer({ deckId }: FlashcardReviewerProps) {
       setLoading(true);
       const dueCards = await flashcardService.getDueFlashcards(deckId);
       console.log(dueCards);
+
+      if (dueCards.length === 0) {
+        const deck = await deckService.getDeck(deckId);
+        setNextReviewDate(deck.next_review_at || null);
+      }
+
       setFlashcards(dueCards);
       setCurrentIndex(0);
       setShowAnswer(false);
@@ -43,6 +51,57 @@ export default function FlashcardReviewer({ deckId }: FlashcardReviewerProps) {
       setLoading(false);
     }
   };
+  if (flashcards.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center">
+          <svg
+            className="w-24 h-24 mx-auto mb-4 text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <h3 className="text-2xl font-bold text-white mb-2">All caught up!</h3>
+          <p className="text-white mb-4">
+            No flashcards are due for review right now.
+          </p>
+          {nextReviewDate && (
+            <div className="text-blue-200 text-lg font-medium">
+              {(() => {
+                const date = new Date(nextReviewDate);
+                const now = new Date();
+                const diff = date.getTime() - now.getTime();
+
+                if (diff <= 0) return "You have cards due now!";
+
+                const minutes = Math.floor(diff / 60000);
+                if (minutes < 60) return `Next review in ${minutes} minutes`;
+
+                const hours = Math.floor(minutes / 60);
+                if (hours < 24) return `Next review in ${hours} hours`;
+
+                const days = Math.floor(hours / 24);
+                return `Next review in ${days} days`;
+              })()}
+            </div>
+          )}
+          <button
+            onClick={() => (window.location.href = `/deck`)}
+            className="mt-6 px-6 py-2 bg-white text-blue-600 rounded-full font-semibold hover:bg-blue-50 transition-colors"
+          >
+            Back to Decks
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const handleReview = async (rating: number) => {
     if (currentIndex >= flashcards.length) return;
