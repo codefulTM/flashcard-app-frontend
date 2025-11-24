@@ -37,4 +37,15 @@ export const flashcardService = {
   async deleteFlashcard(id: string): Promise<void> {
     await apiClient.delete(`/flashcards/${id}`);
   },
+
+  async generateFlashcard(
+    deckId: string,
+    frontContent: string
+  ): Promise<Flashcard> {
+    const response = await apiClient.post<Flashcard>("/flashcards/generate", {
+      deck_id: deckId,
+      front_content: frontContent,
+    });
+    return response.data;
+  },
 };

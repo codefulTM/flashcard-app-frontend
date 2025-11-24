@@ -1,5 +1,6 @@
 import { Flashcard } from "@/app/types/flashcard";
 import { useState } from "react";
+import ReactMarkdown from "react-markdown";
 
 export default function DeckBrowser({
   flashcards,
@@ -23,7 +24,7 @@ export default function DeckBrowser({
                 ${
                   selectedFlashcard?.id === flashcard.id
                     ? "bg-blue-100 text-blue-800 border-blue-300 shadow-md"
-                    : "bg-white hover:bg-gray-100 hover:shadow-sm"
+                    : "bg-white hover:bg-gray-100 hover:shadow-sm text-black"
                 }`}
               >
                 <p className="text-lg font-medium">
@@ -38,8 +39,8 @@ export default function DeckBrowser({
           <p className="text-gray-500">No flashcards found.</p>
         )}
       </aside>
-      <main className="w-2/3 p-6 relative bg-white flex flex-col">
-        <div className="flex justify-between items-center mb-6">
+      <main className="w-2/3 p-6 relative bg-white flex flex-col overflow-y-auto h-full">
+        <div className="flex justify-between items-center mb-6 flex-shrink-0">
           <h2 className="text-2xl font-bold text-gray-800">
             Flashcard Details
           </h2>
@@ -67,10 +68,10 @@ export default function DeckBrowser({
                 {selectedFlashcard.front_content}
               </p>
             </div>
-            <div className="p-6 bg-white rounded-lg shadow-md max-w-xl w-full">
-              <p className="text-xl text-gray-700 leading-relaxed">
-                {selectedFlashcard.back_content}
-              </p>
+            <div className="p-6 bg-white rounded-lg shadow-md max-w-xl w-full text-left">
+              <div className="text-xl text-gray-700 leading-relaxed prose prose-blue max-w-none">
+                <ReactMarkdown>{selectedFlashcard.back_content}</ReactMarkdown>
+              </div>
             </div>
           </div>
         ) : (

@@ -29,8 +29,8 @@ export default function DeckPageClient({ id }: { id: string }) {
   }, [id]);
 
   return (
-    <div className="h-screen flex flex-col">
-      <ul className="flex border-b border-gray-200 mb-4 h-10">
+    <div className="h-screen flex flex-col overflow-hidden">
+      <ul className="flex border-b border-gray-200 mb-4 h-10 z-50 sticky top-0 bg-black flex-shrink-0">
         <li
           className={`px-4 py-2 cursor-pointer ${
             mode === "browse"
@@ -52,10 +52,10 @@ export default function DeckPageClient({ id }: { id: string }) {
           Add
         </li>
       </ul>
-      <div className="flex-1">
+      <div className="flex-1 overflow-hidden">
         {mode === "browse" && <DeckBrowser flashcards={flashcards} />}
         {mode === "add" && (
-          <FlashcardAdder onAddFlashcard={handleAddFlashcard} />
+          <FlashcardAdder deckId={id} onAddFlashcard={handleAddFlashcard} />
         )}
       </div>
     </div>
