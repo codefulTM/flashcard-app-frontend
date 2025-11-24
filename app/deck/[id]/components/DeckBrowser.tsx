@@ -2,42 +2,78 @@ import { Flashcard } from "@/app/types/flashcard";
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 
+interface DeckBrowserProps {
+  flashcards: Flashcard[];
+  page: number;
+  total: number;
+  limit: number;
+  onPageChange: (page: number) => void;
+}
+
 export default function DeckBrowser({
   flashcards,
-}: {
-  flashcards: Flashcard[];
-}) {
+  page,
+  total,
+  limit,
+  onPageChange,
+}: DeckBrowserProps) {
   const [selectedFlashcard, setSelectedFlashcard] = useState<Flashcard | null>(
     null
   );
+
+  const totalPages = Math.ceil(total / limit);
+
   return (
     <div className="flex h-full">
-      <aside className="w-1/3 p-6 border-r border-gray-200 bg-gray-50 overflow-y-auto">
+      <aside className="w-1/3 p-6 border-r border-gray-200 bg-gray-50 flex flex-col">
         <h2 className="text-2xl font-bold mb-6 text-gray-800">Flashcards</h2>
-        {flashcards.length > 0 ? (
-          <ul className="space-y-3">
-            {flashcards.map((flashcard) => (
-              <li
-                key={flashcard.id}
-                onClick={() => setSelectedFlashcard(flashcard)}
-                className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 ease-in-out
-                ${
-                  selectedFlashcard?.id === flashcard.id
-                    ? "bg-blue-100 text-blue-800 border-blue-300 shadow-md"
-                    : "bg-white hover:bg-gray-100 hover:shadow-sm text-black"
-                }`}
-              >
-                <p className="text-lg font-medium">
-                  {flashcard.front_content.length > 70
-                    ? flashcard.front_content.substring(0, 70) + "..."
-                    : flashcard.front_content}
-                </p>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-gray-500">No flashcards found.</p>
-        )}
+        <div className="flex-1 overflow-y-auto">
+          {flashcards.length > 0 ? (
+            <ul className="space-y-3">
+              {flashcards.map((flashcard) => (
+                <li
+                  key={flashcard.id}
+                  onClick={() => setSelectedFlashcard(flashcard)}
+                  className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 ease-in-out
+                  ${
+                    selectedFlashcard?.id === flashcard.id
+                      ? "bg-blue-100 text-blue-800 border-blue-300 shadow-md"
+                      : "bg-white hover:bg-gray-100 hover:shadow-sm text-black"
+                  }`}
+                >
+                  <p className="text-lg font-medium">
+                    {flashcard.front_content.length > 70
+                      ? flashcard.front_content.substring(0, 70) + "..."
+                      : flashcard.front_content}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-gray-500">No flashcards found.</p>
+          )}
+        </div>
+
+        {/* Pagination Controls */}
+        <div className="mt-4 pt-4 border-t border-gray-200 flex justify-between items-center">
+          <button
+            onClick={() => onPageChange(Math.max(1, page - 1))}
+            disabled={page === 1}
+            className="px-3 py-1 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Previous
+          </button>
+          <span className="text-sm text-gray-600">
+            Page {page} of {totalPages || 1}
+          </span>
+          <button
+            onClick={() => onPageChange(Math.min(totalPages, page + 1))}
+            disabled={page === totalPages || totalPages === 0}
+            className="px-3 py-1 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Next
+          </button>
+        </div>
       </aside>
       <main className="w-2/3 p-6 relative bg-white flex flex-col overflow-y-auto h-full">
         <div className="flex justify-between items-center mb-6 flex-shrink-0">

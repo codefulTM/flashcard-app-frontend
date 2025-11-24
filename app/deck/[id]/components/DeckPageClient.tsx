@@ -10,27 +10,32 @@ import { toast } from "react-hot-toast";
 export default function DeckPageClient({ id }: { id: string }) {
   const [mode, setMode] = useState<"browse" | "add">("browse");
   const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const limit = 10;
 
   const handleAddFlashcard = (flashcard: Flashcard) => {
-    setFlashcards((prevFlashcards) => [...prevFlashcards, flashcard]);
+    setFlashcards((prevFlashcards) => [flashcard, ...prevFlashcards]);
+    setTotal((prev) => prev + 1);
   };
 
   useEffect(() => {
     const fetchFlashcards = async () => {
       try {
-        const flashcards = await flashcardService.getFlashcards(id);
-        setFlashcards(flashcards);
+        const response = await flashcardService.getFlashcards(id, page, limit);
+        setFlashcards(response.data);
+        setTotal(response.total);
       } catch (error) {
         console.error("Failed to fetch flashcards", error);
         toast.error("Failed to load flashcards");
       }
     };
     fetchFlashcards();
-  }, [id]);
+  }, [id, page]);
 
   return (
     <div className="h-screen flex flex-col overflow-hidden">
-      <ul className="flex border-b border-gray-200 mb-4 h-10 z-50 sticky top-0 bg-black flex-shrink-0">
+      <ul className="flex border-b border-gray-200 mb-4 h-10 z-50 sticky top-0 bg-white flex-shrink-0">
         <li
           className={`px-4 py-2 cursor-pointer ${
             mode === "browse"
@@ -53,7 +58,15 @@ export default function DeckPageClient({ id }: { id: string }) {
         </li>
       </ul>
       <div className="flex-1 overflow-hidden">
-        {mode === "browse" && <DeckBrowser flashcards={flashcards} />}
+        {mode === "browse" && (
+          <DeckBrowser
+            flashcards={flashcards}
+            page={page}
+            total={total}
+            limit={limit}
+            onPageChange={setPage}
+          />
+        )}
         {mode === "add" && (
           <FlashcardAdder deckId={id} onAddFlashcard={handleAddFlashcard} />
         )}

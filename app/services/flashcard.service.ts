@@ -6,10 +6,17 @@ import {
 } from "../types/flashcard";
 
 export const flashcardService = {
-  async getFlashcards(deckId: string): Promise<Flashcard[]> {
-    const response = await apiClient.get<Flashcard[]>("/flashcards", {
-      params: { deckId },
-    });
+  async getFlashcards(
+    deckId: string,
+    page: number = 1,
+    limit: number = 10
+  ): Promise<{ data: Flashcard[]; total: number }> {
+    const response = await apiClient.get<{ data: Flashcard[]; total: number }>(
+      "/flashcards",
+      {
+        params: { deckId, page, limit },
+      }
+    );
     return response.data;
   },
 
