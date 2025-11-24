@@ -9,6 +9,7 @@ interface AiFlashcardAdderProps {
 }
 
 interface FormValues {
+  prompt: string;
   flashcards: {
     front_content: string;
   }[];
@@ -18,6 +19,12 @@ export default function AiFlashcardAdder({
   deckId,
   onAddFlashcard,
 }: AiFlashcardAdderProps) {
+  const defaultPrompt = `You are a flashcard generator. Your task is to create informative back content using simple language for a given front content.
+The back content should primarily focus on providing dictionary definitions for the key term(s) or concept(s) presented in the front content.
+If applicable, include a brief example or context to aid understanding.
+Format the definitions clearly, perhaps using bullet points or numbered lists.
+Reply with nothing more than the back content, ensuring it's ready for a flashcard.`;
+
   const {
     register,
     control,
@@ -26,6 +33,7 @@ export default function AiFlashcardAdder({
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     defaultValues: {
+      prompt: defaultPrompt,
       flashcards: [{ front_content: "" }],
     },
   });
@@ -38,7 +46,11 @@ export default function AiFlashcardAdder({
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     try {
       const promises = data.flashcards.map((card) =>
-        flashcardService.generateFlashcard(deckId, card.front_content)
+        flashcardService.generateFlashcard(
+          deckId,
+          card.front_content,
+          data.prompt
+        )
       );
 
       const newFlashcards = await Promise.all(promises);
@@ -47,7 +59,7 @@ export default function AiFlashcardAdder({
       toast.success(
         `Successfully generated and added ${newFlashcards.length} flashcards!`
       );
-      reset({ flashcards: [{ front_content: "" }] });
+      reset({ prompt: defaultPrompt, flashcards: [{ front_content: "" }] });
     } catch (error) {
       console.error("Failed to generate flashcards", error);
       toast.error("Failed to generate some flashcards. Please try again.");
@@ -110,6 +122,27 @@ export default function AiFlashcardAdder({
               </>
             )}
           </button>
+        </div>
+
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            AI Prompt (Instructions)
+          </label>
+          <textarea
+            rows={4}
+            className="w-full p-3 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500 text-black text-sm"
+            placeholder="Enter instructions for the AI..."
+            defaultValue={defaultPrompt}
+            {...register("prompt", {
+              required: "Prompt is required",
+            })}
+          />
+          {errors.prompt && (
+            <p className="mt-1 text-sm text-red-600">{errors.prompt.message}</p>
+          )}
+          <p className="mt-1 text-xs text-gray-500">
+            Customize how the AI generates the back content.
+          </p>
         </div>
 
         <div className="space-y-6">

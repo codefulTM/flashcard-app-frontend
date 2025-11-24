@@ -49,11 +49,13 @@ export const flashcardService = {
 
   async generateFlashcard(
     deckId: string,
-    frontContent: string
+    frontContent: string,
+    prompt?: string
   ): Promise<Flashcard> {
     const response = await apiClient.post<Flashcard>("/flashcards/generate", {
       deck_id: deckId,
       front_content: frontContent,
+      prompt,
     });
     return response.data;
   },
