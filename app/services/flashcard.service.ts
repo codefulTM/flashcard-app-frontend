@@ -9,12 +9,13 @@ export const flashcardService = {
   async getFlashcards(
     deckId: string,
     page: number = 1,
-    limit: number = 10
+    limit: number = 10,
+    search?: string
   ): Promise<{ data: Flashcard[]; total: number }> {
     const response = await apiClient.get<{ data: Flashcard[]; total: number }>(
       "/flashcards",
       {
-        params: { deckId, page, limit },
+        params: { deckId, page, limit, search },
       }
     );
     return response.data;

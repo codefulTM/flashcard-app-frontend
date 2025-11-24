@@ -8,6 +8,7 @@ interface DeckBrowserProps {
   total: number;
   limit: number;
   onPageChange: (page: number) => void;
+  onSearch: (query: string) => void;
 }
 
 export default function DeckBrowser({
@@ -16,17 +17,41 @@ export default function DeckBrowser({
   total,
   limit,
   onPageChange,
+  onSearch,
 }: DeckBrowserProps) {
   const [selectedFlashcard, setSelectedFlashcard] = useState<Flashcard | null>(
     null
   );
+  const [searchQuery, setSearchQuery] = useState("");
 
   const totalPages = Math.ceil(total / limit);
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSearch(searchQuery);
+  };
 
   return (
     <div className="flex h-full">
       <aside className="w-1/3 p-6 border-r border-gray-200 bg-gray-50 flex flex-col">
         <h2 className="text-2xl font-bold mb-6 text-gray-800">Flashcards</h2>
+
+        <form onSubmit={handleSearchSubmit} className="mb-4 flex gap-2">
+          <input
+            type="text"
+            placeholder="Search flashcards..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
+          />
+          <button
+            type="submit"
+            className="px-3 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 transition-colors"
+          >
+            Search
+          </button>
+        </form>
+
         <div className="flex-1 overflow-y-auto">
           {flashcards.length > 0 ? (
             <ul className="space-y-3">

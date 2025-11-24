@@ -14,6 +14,8 @@ export default function DeckPageClient({ id }: { id: string }) {
   const [total, setTotal] = useState(0);
   const limit = 10;
 
+  const [search, setSearch] = useState("");
+
   const handleAddFlashcard = (flashcard: Flashcard) => {
     setFlashcards((prevFlashcards) => [flashcard, ...prevFlashcards]);
     setTotal((prev) => prev + 1);
@@ -22,7 +24,12 @@ export default function DeckPageClient({ id }: { id: string }) {
   useEffect(() => {
     const fetchFlashcards = async () => {
       try {
-        const response = await flashcardService.getFlashcards(id, page, limit);
+        const response = await flashcardService.getFlashcards(
+          id,
+          page,
+          limit,
+          search
+        );
         setFlashcards(response.data);
         setTotal(response.total);
       } catch (error) {
@@ -31,7 +38,12 @@ export default function DeckPageClient({ id }: { id: string }) {
       }
     };
     fetchFlashcards();
-  }, [id, page]);
+  }, [id, page, search]);
+
+  const handleSearch = (query: string) => {
+    setSearch(query);
+    setPage(1); // Reset to first page on new search
+  };
 
   return (
     <div className="h-screen flex flex-col overflow-hidden">
@@ -65,6 +77,7 @@ export default function DeckPageClient({ id }: { id: string }) {
             total={total}
             limit={limit}
             onPageChange={setPage}
+            onSearch={handleSearch}
           />
         )}
         {mode === "add" && (
