@@ -64,7 +64,7 @@ export default function CreateDeckModal({
             <span className="sr-only">Close modal</span>
           </button>
           <div className="px-6 py-6 lg:px-8">
-            <h3 className="mb-4 text-xl font-medium text-gray-900 dark:text-white">
+            <h3 className="mb-4 text-xl font-medium text-[var(--text-primary)]">
               Create a new deck
             </h3>
             <form className="space-y-6" onSubmit={handleSubmit(onFormSubmit)}>
@@ -76,14 +76,14 @@ export default function CreateDeckModal({
               <div>
                 <label
                   htmlFor="name"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  className="block mb-2 text-sm font-medium text-[var(--text-primary)]"
                 >
                   Deck Name
                 </label>
                 <input
                   type="text"
                   id="name"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                  className="bg-[var(--glass-bg)] border border-[var(--glass-border)] text-[var(--text-primary)] text-sm rounded-lg focus:ring-[var(--primary-start)] focus:border-[var(--primary-start)] block w-full p-2.5"
                   placeholder="e.g., Biology 101"
                   {...register("name", { required: "Deck name is required" })}
                 />
@@ -96,14 +96,14 @@ export default function CreateDeckModal({
               <div>
                 <label
                   htmlFor="description"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  className="block mb-2 text-sm font-medium text-[var(--text-primary)]"
                 >
                   Description (Optional)
                 </label>
                 <textarea
                   id="description"
                   rows={3}
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                  className="bg-[var(--glass-bg)] border border-[var(--glass-border)] text-[var(--text-primary)] text-sm rounded-lg focus:ring-[var(--primary-start)] focus:border-[var(--primary-start)] block w-full p-2.5"
                   placeholder="What is this deck about?"
                   {...register("description")}
                 ></textarea>
@@ -113,13 +113,13 @@ export default function CreateDeckModal({
                   <input
                     id="is_public"
                     type="checkbox"
-                    className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-blue-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800"
+                    className="w-4 h-4 border border-[var(--glass-border)] rounded bg-[var(--glass-bg)] focus:ring-3 focus:ring-[var(--primary-start)]"
                     {...register("is_public")}
                   />
                 </div>
                 <label
                   htmlFor="is_public"
-                  className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                  className="ml-2 text-sm font-medium text-[var(--text-primary)]"
                 >
                   Make this deck public
                 </label>

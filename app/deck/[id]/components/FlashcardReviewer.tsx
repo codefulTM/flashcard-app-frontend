@@ -6,6 +6,7 @@ import { deckService } from "@/app/services/deck.service";
 import { flashcardService } from "@/app/services/flashcard.service";
 import { toast } from "react-hot-toast";
 import ReactMarkdown from "react-markdown";
+import { calculateSM2, ratingToQuality } from "@/app/utils/sm2.algorithm";
 
 interface FlashcardReviewerProps {
   deckId: string;
@@ -51,57 +52,21 @@ export default function FlashcardReviewer({ deckId }: FlashcardReviewerProps) {
       setLoading(false);
     }
   };
-  if (flashcards.length === 0) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-center">
-          <svg
-            className="w-24 h-24 mx-auto mb-4 text-gray-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          <h3 className="text-2xl font-bold text-white mb-2">All caught up!</h3>
-          <p className="text-white mb-4">
-            No flashcards are due for review right now.
-          </p>
-          {nextReviewDate && (
-            <div className="text-blue-200 text-lg font-medium">
-              {(() => {
-                const date = new Date(nextReviewDate);
-                const now = new Date();
-                const diff = date.getTime() - now.getTime();
 
-                if (diff <= 0) return "You have cards due now!";
+  const getPredictedInterval = (rating: number) => {
+    if (!currentCard) return "";
 
-                const minutes = Math.floor(diff / 60000);
-                if (minutes < 60) return `Next review in ${minutes} minutes`;
+    const quality = ratingToQuality(rating);
+    const result = calculateSM2({
+      quality,
+      repetitions: currentCard.repetitions || 0,
+      easeFactor: currentCard.ease_factor || 2.5,
+      interval: currentCard.interval || 0,
+    });
 
-                const hours = Math.floor(minutes / 60);
-                if (hours < 24) return `Next review in ${hours} hours`;
-
-                const days = Math.floor(hours / 24);
-                return `Next review in ${days} days`;
-              })()}
-            </div>
-          )}
-          <button
-            onClick={() => (window.location.href = `/deck`)}
-            className="mt-6 px-6 py-2 bg-white text-blue-600 rounded-full font-semibold hover:bg-blue-50 transition-colors"
-          >
-            Back to Decks
-          </button>
-        </div>
-      </div>
-    );
-  }
+    if (result.interval === 0) return "10 min";
+    return `${result.interval} day${result.interval !== 1 ? "s" : ""}`;
+  };
 
   const handleReview = async (rating: number) => {
     if (currentIndex >= flashcards.length) return;
@@ -133,11 +98,13 @@ export default function FlashcardReviewer({ deckId }: FlashcardReviewerProps) {
           const nextDueCards = await flashcardService.getDueFlashcards(deckId);
 
           if (nextDueCards.length > 0) {
+            toast.success("You have more cards due for review!");
             setFlashcards(nextDueCards);
             setCurrentIndex(0);
             setShowAnswer(false);
             setReviewStartTime(Date.now());
           } else {
+            toast.success("You have finished reviewing all cards!");
             setCurrentIndex(currentIndex + 1);
           }
         } catch (error) {
@@ -189,9 +156,35 @@ export default function FlashcardReviewer({ deckId }: FlashcardReviewerProps) {
             />
           </svg>
           <h3 className="text-2xl font-bold text-white mb-2">All caught up!</h3>
-          <p className="text-white">
+          <p className="text-white mb-4">
             No flashcards are due for review right now.
           </p>
+          {nextReviewDate && (
+            <div className="text-blue-200 text-lg font-medium">
+              {(() => {
+                const date = new Date(nextReviewDate);
+                const now = new Date();
+                const diff = date.getTime() - now.getTime();
+
+                if (diff <= 0) return "You have cards due now!";
+
+                const minutes = Math.floor(diff / 60000);
+                if (minutes < 60) return `Next review in ${minutes} minutes`;
+
+                const hours = Math.floor(minutes / 60);
+                if (hours < 24) return `Next review in ${hours} hours`;
+
+                const days = Math.floor(hours / 24);
+                return `Next review in ${days} days`;
+              })()}
+            </div>
+          )}
+          <button
+            onClick={() => (window.location.href = `/deck`)}
+            className="mt-6 px-6 py-2 bg-white text-blue-600 rounded-full font-semibold hover:bg-blue-50 transition-colors"
+          >
+            Back to Decks
+          </button>
         </div>
       </div>
     );
@@ -306,7 +299,9 @@ export default function FlashcardReviewer({ deckId }: FlashcardReviewerProps) {
                   className="px-4 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors shadow-md flex flex-col items-center"
                 >
                   <span className="text-lg font-bold">Again</span>
-                  <span className="text-xs opacity-90">&lt;1 day</span>
+                  <span className="text-xs opacity-90">
+                    {getPredictedInterval(1)}
+                  </span>
                 </button>
                 <button
                   onClick={() => handleReview(2)}
@@ -314,9 +309,7 @@ export default function FlashcardReviewer({ deckId }: FlashcardReviewerProps) {
                 >
                   <span className="text-lg font-bold">Hard</span>
                   <span className="text-xs opacity-90">
-                    {currentCard.interval
-                      ? `${Math.round(currentCard.interval * 0.8)} days`
-                      : "1 day"}
+                    {getPredictedInterval(2)}
                   </span>
                 </button>
                 <button
@@ -325,9 +318,7 @@ export default function FlashcardReviewer({ deckId }: FlashcardReviewerProps) {
                 >
                   <span className="text-lg font-bold">Good</span>
                   <span className="text-xs opacity-90">
-                    {currentCard.interval
-                      ? `${currentCard.interval} days`
-                      : "1 day"}
+                    {getPredictedInterval(3)}
                   </span>
                 </button>
                 <button
@@ -336,9 +327,7 @@ export default function FlashcardReviewer({ deckId }: FlashcardReviewerProps) {
                 >
                   <span className="text-lg font-bold">Easy</span>
                   <span className="text-xs opacity-90">
-                    {currentCard.interval
-                      ? `${Math.round(currentCard.interval * 1.3)} days`
-                      : "6 days"}
+                    {getPredictedInterval(4)}
                   </span>
                 </button>
               </div>
