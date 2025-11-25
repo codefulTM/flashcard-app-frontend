@@ -253,14 +253,16 @@ export default function FlashcardReviewer({ deckId }: FlashcardReviewerProps) {
       {/* Progress Bar */}
       <div className="mb-6">
         <div className="flex justify-between items-center mb-2">
-          <span className="text-sm font-medium text-white">
+          <span className="text-sm font-medium text-[var(--text-primary)]">
             Card {currentIndex + 1} of {flashcards.length}
           </span>
-          <span className="text-sm font-medium text-white">{progress}%</span>
+          <span className="text-sm font-medium text-[var(--text-primary)]">
+            {progress}%
+          </span>
         </div>
         <div className="w-full bg-gray-200 rounded-full h-2">
           <div
-            className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+            className="bg-[var(--primary-start)] h-2 rounded-full transition-all duration-300"
             style={{ width: `${progress}%` }}
           ></div>
         </div>
@@ -281,7 +283,7 @@ export default function FlashcardReviewer({ deckId }: FlashcardReviewerProps) {
             <div className="text-center">
               <button
                 onClick={() => setShowAnswer(true)}
-                className="px-8 py-4 bg-blue-600 text-white text-lg font-semibold rounded-lg hover:bg-blue-700 transition-colors shadow-md"
+                className="px-8 py-4 bg-[var(--primary-start)] text-white text-lg font-semibold rounded-lg hover:bg-[var(--primary-end)] transition-colors shadow-md"
               >
                 Show Answer
               </button>
