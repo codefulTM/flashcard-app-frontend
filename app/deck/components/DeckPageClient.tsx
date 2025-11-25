@@ -100,10 +100,12 @@ export default function DeckPageClient() {
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-6 text-indigo-700">Your Decks</h1>
+      <h1 className="text-3xl font-bold mb-6 text-[var(--primary-start)]">
+        Your Decks
+      </h1>
       <div className="flex flex-wrap gap-4">
         <button
-          className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-blue-500 hover:text-blue-600 transition-colors w-48 h-48"
+          className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-[var(--primary-start)] hover:text-[var(--primary-start)] transition-colors w-48 h-48"
           onClick={() => setIsModalOpen(true)}
         >
           <span className="text-5xl">+</span>
@@ -172,7 +174,7 @@ export default function DeckPageClient() {
                 : "No cards due"}
             </p>
             <button
-              className="mt-4 mx-auto w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors self-end"
+              className="mt-4 mx-auto w-full px-4 py-2 bg-[var(--primary-start)] text-white rounded-md hover:bg-[var(--primary-end)] transition-colors self-end"
               onClick={(e) => {
                 e.stopPropagation();
                 router.push(`/deck/${deck.id}/review`);

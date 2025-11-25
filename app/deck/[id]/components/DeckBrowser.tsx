@@ -103,22 +103,24 @@ export default function DeckBrowser({
   return (
     <div className="flex h-full">
       {isUpdateModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-2xl">
-            <h3 className="text-xl font-bold mb-4 text-black">
+        <div className="fixed inset-0 bg-black/50 bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-[var(--glass-bg)] backdrop-blur-xl p-6 rounded-lg shadow-xl w-full max-w-2xl">
+            <h3 className="text-xl font-bold mb-4 text-[var(--text-primary)]">
               Update Flashcard
             </h3>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-[var(--text-primary)] mb-1">
                   Front Content
                 </label>
                 <textarea
                   {...register("front_content", {
                     required: "Front content is required",
                   })}
-                  className={`w-full p-2 text-black border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-h-[100px] ${
-                    errors.front_content ? "border-red-500" : "border-gray-300"
+                  className={`w-full p-2 text-[var(--text-primary)] border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-h-[100px] ${
+                    errors.front_content
+                      ? "border-red-500"
+                      : "border-[var(--text-primary)]"
                   }`}
                 />
                 {errors.front_content && (
@@ -128,15 +130,17 @@ export default function DeckBrowser({
                 )}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-[var(--text-primary)] mb-1">
                   Back Content (Markdown supported)
                 </label>
                 <textarea
                   {...register("back_content", {
                     required: "Back content is required",
                   })}
-                  className={`w-full p-2 text-black border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-h-[200px] ${
-                    errors.back_content ? "border-red-500" : "border-gray-300"
+                  className={`w-full p-2 text-[var(--text-primary)] border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-h-[200px] ${
+                    errors.back_content
+                      ? "border-red-500"
+                      : "border-[var(--text-primary)]"
                   }`}
                 />
                 {errors.back_content && (
@@ -149,13 +153,13 @@ export default function DeckBrowser({
                 <button
                   type="button"
                   onClick={() => setIsUpdateModalOpen(false)}
-                  className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
+                  className="px-4 py-2 text-[var(--text-primary)] bg-[var(--primary-mid)] rounded-md hover:bg-[var(--primary-start)]"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700"
+                  className="px-4 py-2 text-[var(--text-primary)] bg-[var(--primary-mid)] rounded-md hover:bg-[var(--primary-start)]"
                 >
                   Update
                 </button>
@@ -165,12 +169,12 @@ export default function DeckBrowser({
         </div>
       )}
       {isDeleteModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
-            <h3 className="text-xl font-bold mb-4 text-black">
+        <div className="fixed inset-0 bg-black/50 bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-[var(--glass-bg)] backdrop-blur-xl p-6 rounded-lg shadow-xl w-full max-w-md">
+            <h3 className="text-xl font-bold mb-4 text-[var(--text-primary)]">
               Delete Flashcard
             </h3>
-            <p className="text-gray-700 mb-6">
+            <p className="text-[var(--text-primary)] mb-6">
               Are you sure you want to delete this flashcard? This action cannot
               be undone.
             </p>
@@ -178,7 +182,7 @@ export default function DeckBrowser({
               <button
                 type="button"
                 onClick={() => setIsDeleteModalOpen(false)}
-                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
+                className="px-4 py-2 text-[var(--text-primary)] bg-[var(--primary-mid)] rounded-md hover:bg-[var(--primary-start)]"
               >
                 Cancel
               </button>
@@ -193,8 +197,10 @@ export default function DeckBrowser({
           </div>
         </div>
       )}
-      <aside className="w-1/3 p-6 border-r border-gray-200 bg-gray-50 flex flex-col">
-        <h2 className="text-2xl font-bold mb-6 text-gray-800">Flashcards</h2>
+      <aside className="w-1/3 p-6 border-r border-[var(--glass-bg)] bg-[var(--glass-bg)] flex flex-col">
+        <h2 className="text-2xl font-bold mb-6 text-[var(--text-primary)]">
+          Flashcards
+        </h2>
 
         <form onSubmit={handleSearchSubmit} className="mb-4 flex gap-2">
           <input
@@ -202,11 +208,11 @@ export default function DeckBrowser({
             placeholder="Search flashcards..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
+            className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-[var(--text-primary)]"
           />
           <button
             type="submit"
-            className="px-3 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 transition-colors"
+            className="px-3 py-2 bg-[var(--primary-start)] text-[var(--text-primary)] rounded-md text-sm hover:bg-[var(--primary-mid)] transition-colors"
           >
             Search
           </button>
@@ -222,8 +228,8 @@ export default function DeckBrowser({
                   className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 ease-in-out
                   ${
                     selectedFlashcard?.id === flashcard.id
-                      ? "bg-blue-100 text-blue-800 border-blue-300 shadow-md"
-                      : "bg-white hover:bg-gray-100 hover:shadow-sm text-black"
+                      ? "bg-[var(--primary-start)] text-[var(--text-primary)] border-[var(--primary-mid)] shadow-md"
+                      : "bg-[var(--glass-bg)] hover:bg-[var(--primary-mid)] hover:shadow-sm text-[var(--text-primary)]"
                   }`}
                 >
                   <p className="text-lg font-medium">
@@ -235,16 +241,16 @@ export default function DeckBrowser({
               ))}
             </ul>
           ) : (
-            <p className="text-gray-500">No flashcards found.</p>
+            <p className="text-[var(--text-primary)]">No flashcards found.</p>
           )}
         </div>
 
         {/* Pagination Controls */}
-        <div className="mt-4 pt-4 border-t border-gray-200 flex justify-between items-center">
+        <div className="mt-4 pt-4 border-t border-[var(--glass-bg)] flex justify-between items-center">
           <button
             onClick={() => onPageChange(Math.max(1, page - 1))}
             disabled={page === 1}
-            className="px-3 py-1 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 py-1 bg-[var(--glass-bg)] border border-[var(--glass-bg)] rounded-md text-sm font-medium text-[var(--text-primary)] hover:bg-[var(--primary-mid)] disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Previous
           </button>
@@ -254,22 +260,22 @@ export default function DeckBrowser({
           <button
             onClick={() => onPageChange(Math.min(totalPages, page + 1))}
             disabled={page === totalPages || totalPages === 0}
-            className="px-3 py-1 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 py-1 bg-[var(--glass-bg)] border border-[var(--glass-bg)] rounded-md text-sm font-medium text-[var(--text-primary)] hover:bg-[var(--primary-mid)] disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Next
           </button>
         </div>
       </aside>
-      <main className="w-2/3 p-6 relative bg-white flex flex-col overflow-y-auto h-full">
+      <main className="w-2/3 p-6 relative bg-[var(--glass-bg)] flex flex-col overflow-y-auto h-full">
         <div className="flex justify-between items-center mb-6 flex-shrink-0">
-          <h2 className="text-2xl font-bold text-gray-800">
+          <h2 className="text-2xl font-bold text-[var(--text-primary)]">
             Flashcard Details
           </h2>
           <div className="relative">
             <button
               disabled={!selectedFlashcard}
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-2 rounded-full hover:bg-gray-100 transition-colors duration-200 text-gray-600"
+              className="p-2 rounded-full hover:bg-[var(--glass-bg)] transition-colors duration-200 text-[var(--text-primary)]"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -288,15 +294,15 @@ export default function DeckBrowser({
             </button>
 
             {isMenuOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 border border-gray-200">
+              <div className="absolute right-0 mt-2 w-48 bg-[var(--primary-start))]/50 rounded-md shadow-lg py-1 z-10 border border-[var(--glass-bg)]">
                 <button
-                  className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  className="block w-full text-left px-4 py-2 text-sm text-[var(--text-primary)] hover:bg-[var(--glass-bg)]"
                   onClick={handleUpdateClick}
                 >
                   Update
                 </button>
                 <button
-                  className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                  className="block w-full text-left px-4 py-2 text-sm text-[var(--text-primary)] hover:bg-[var(--glass-bg)]"
                   onClick={handleDeleteClick}
                 >
                   Delete
@@ -306,14 +312,14 @@ export default function DeckBrowser({
           </div>
         </div>
         {selectedFlashcard ? (
-          <div className="flex-grow flex flex-col justify-center items-center p-8 bg-gray-50 border border-gray-200 rounded-lg shadow-inner text-center">
-            <div className="mb-8 p-6 bg-white rounded-lg shadow-md max-w-xl w-full">
-              <p className="text-3xl font-extrabold text-gray-900 leading-relaxed">
+          <div className="flex-grow flex flex-col justify-center items-center p-8 bg-[var(--glass-bg)] border border-[var(--glass-bg)] rounded-lg shadow-inner text-center">
+            <div className="mb-8 p-6 bg-[var(--primary-start)]/50 rounded-lg shadow-md max-w-xl w-full">
+              <p className="text-3xl font-extrabold text-[var(--text-primary)] leading-relaxed">
                 {selectedFlashcard.front_content}
               </p>
             </div>
-            <div className="p-6 bg-white rounded-lg shadow-md max-w-xl w-full text-left">
-              <div className="text-xl text-gray-700 leading-relaxed prose prose-blue max-w-none">
+            <div className="p-6 bg-[var(--primary-start)]/50 rounded-lg shadow-md max-w-xl w-full text-left">
+              <div className="text-xl text-[var(--text-primary)] leading-relaxed prose prose-blue max-w-none">
                 <ReactMarkdown>
                   {selectedFlashcard.back_content.replace(/\n/g, "  \n")}
                 </ReactMarkdown>
@@ -321,7 +327,7 @@ export default function DeckBrowser({
             </div>
           </div>
         ) : (
-          <div className="flex-grow flex items-center justify-center text-gray-500 text-lg">
+          <div className="flex-grow flex items-center justify-center text-[var(--text-primary)] text-lg">
             Select a flashcard to view details.
           </div>
         )}

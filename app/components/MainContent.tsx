@@ -11,6 +11,6 @@ export default function MainContent({
   const isAuthPage = pathname === "/login" || pathname === "/register";
 
   return (
-    <main className={`flex-1 ${!isAuthPage ? "ml-64" : ""}`}>{children}</main>
+    <main className={`flex-1 ${!isAuthPage ? "ml-72" : ""}`}>{children}</main>
   );
 }

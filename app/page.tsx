@@ -12,7 +12,7 @@ export default function Home() {
         {/* Hero Section */}
         <section className="text-center space-y-8 py-16">
           <div className="space-y-4">
-            <h1 className="text-5xl sm:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 tracking-tight pb-2">
+            <h1 className="text-5xl sm:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[var(--primary-start)] via-[var(--primary-mid)] to-[var(--primary-end)] tracking-tight pb-2">
               Master Your Knowledge
             </h1>
             <p className="text-xl sm:text-2xl text-gray-600 max-w-2xl mx-auto leading-relaxed font-light">
@@ -26,7 +26,7 @@ export default function Home() {
             {user ? (
               <Link
                 href="/deck"
-                className="px-8 py-4 bg-indigo-600 text-white rounded-full font-bold text-lg shadow-lg hover:bg-indigo-700 hover:shadow-xl hover:scale-105 transition-all duration-200"
+                className="px-8 py-4 bg-[var(--primary-start)] text-white rounded-full font-bold text-lg shadow-lg hover:bg-[var(--primary-end)] hover:shadow-xl hover:scale-105 transition-all duration-200"
               >
                 Go to My Decks
               </Link>
@@ -34,13 +34,13 @@ export default function Home() {
               <>
                 <Link
                   href="/register"
-                  className="px-8 py-4 bg-indigo-600 text-white rounded-full font-bold text-lg shadow-lg hover:bg-indigo-700 hover:shadow-xl hover:scale-105 transition-all duration-200"
+                  className="px-8 py-4 bg-[var(--primary-start)] text-white rounded-full font-bold text-lg shadow-lg hover:bg-[var(--primary-end)] hover:shadow-xl hover:scale-105 transition-all duration-200"
                 >
                   Get Started Free
                 </Link>
                 <Link
                   href="/login"
-                  className="px-8 py-4 bg-white text-indigo-600 border-2 border-indigo-100 rounded-full font-bold text-lg shadow-sm hover:border-indigo-200 hover:bg-gray-50 hover:scale-105 transition-all duration-200"
+                  className="px-8 py-4 bg-white text-[var(--primary-start)] border-2 border-[var(--primary-start)] rounded-full font-bold text-lg shadow-sm hover:border-[var(--primary-end)] hover:bg-gray-50 hover:scale-105 transition-all duration-200"
                 >
                   Login
                 </Link>

@@ -67,7 +67,7 @@ Reply with nothing more than the back content, ensuring it's ready for a flashca
   };
 
   return (
-    <div className="p-6 bg-gray-50 h-full overflow-y-auto">
+    <div className="px-6 bg-gray-50 h-full overflow-y-auto">
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="flex justify-between items-center mb-6 sticky top-0 bg-gray-50 z-10 py-2">
           <h2 className="text-2xl font-bold text-gray-800">

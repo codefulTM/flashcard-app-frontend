@@ -59,16 +59,16 @@ export default function ManualFlashcardAdder({
   };
 
   return (
-    <div className="p-6 bg-gray-50 h-full overflow-y-auto">
+    <div className="px-6 bg-[var(--glass-bg)] h-full overflow-y-auto">
       <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="flex justify-between items-center mb-6 sticky top-0 bg-gray-50 z-10 py-2">
-          <h2 className="text-2xl font-bold text-gray-800">
+        <div className="flex justify-between items-center mb-6 sticky top-0 bg-[var(--glass-bg)] py-2 z-10">
+          <h2 className="text-2xl font-bold text-[var(--text-primary)]">
             Add Flashcards Manually
           </h2>
           <button
             type="submit"
             disabled={isSubmitting}
-            className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 shadow-md"
+            className="px-6 py-2 bg-[var(--primary-start)] text-[var(--text-primary)] rounded-md hover:bg-[var(--primary-mid)] transition-colors disabled:opacity-50 shadow-md"
           >
             {isSubmitting ? "Adding..." : "Add All Flashcards"}
           </button>
@@ -78,17 +78,17 @@ export default function ManualFlashcardAdder({
           {fields.map((field, index) => (
             <div
               key={field.id}
-              className="p-6 bg-white rounded-lg shadow-md border border-gray-200 relative"
+              className="p-6 bg-[var(--primary-start)]/50 rounded-lg shadow-md border border-[var(--glass-bg)] relative"
             >
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold text-gray-700">
+                <h3 className="text-lg font-semibold text-[var(--text-primary)]">
                   Card {index + 1}
                 </h3>
                 {fields.length > 1 && (
                   <button
                     type="button"
                     onClick={() => remove(index)}
-                    className="text-red-500 hover:text-red-700 transition-colors"
+                    className="text-[var(--text-primary)] hover:text-[var(--text-primary)] transition-colors"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -110,12 +110,12 @@ export default function ManualFlashcardAdder({
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-[var(--text-primary)] mb-1">
                     Front (Question/Term)
                   </label>
                   <textarea
                     rows={3}
-                    className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-black"
+                    className="w-full p-3 border border-[var(--glass-bg)] rounded-md focus:ring-blue-500 focus:border-blue-500 text-[var(--text-primary)]"
                     placeholder="Enter the question or term..."
                     {...register(`flashcards.${index}.front_content` as const, {
                       required: "Front content is required",
@@ -128,12 +128,12 @@ export default function ManualFlashcardAdder({
                   )}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-[var(--text-primary)] mb-1">
                     Back (Answer/Definition)
                   </label>
                   <textarea
                     rows={3}
-                    className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-black"
+                    className="w-full p-3 border border-[var(--glass-bg)] rounded-md focus:ring-blue-500 focus:border-blue-500 text-[var(--text-primary)]"
                     placeholder="Enter the answer or definition..."
                     {...register(`flashcards.${index}.back_content` as const, {
                       required: "Back content is required",
@@ -154,7 +154,7 @@ export default function ManualFlashcardAdder({
           <button
             type="button"
             onClick={() => append({ front_content: "", back_content: "" })}
-            className="flex items-center justify-center w-12 h-12 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 transition-colors shadow-sm"
+            className="flex items-center justify-center w-12 h-12 bg-[var(--primary-start)] text-[var(--text-primary)] rounded-full hover:bg-[var(--primary-start)]/50 transition-colors shadow-sm"
             title="Add another card"
           >
             <svg

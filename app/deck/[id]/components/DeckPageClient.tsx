@@ -59,12 +59,12 @@ export default function DeckPageClient({ id }: { id: string }) {
 
   return (
     <div className="h-screen flex flex-col overflow-hidden">
-      <ul className="flex border-b border-gray-200 mb-4 h-10 z-50 sticky top-0 bg-white flex-shrink-0">
+      <ul className="flex border-b border-[var(--primary-end)] h-10 z-50 sticky top-0 bg-[var(--primary-start)] flex-shrink-0">
         <li
           className={`px-4 py-2 cursor-pointer ${
             mode === "browse"
-              ? "border-b-2 border-blue-500 text-blue-500 font-semibold"
-              : "text-gray-500 hover:text-gray-700"
+              ? "border-b-2 border-[var(--primary-end)] text-[var(--text-primary)] font-semibold"
+              : "text-[var(--text-secondary)]"
           }`}
           onClick={() => setMode("browse")}
         >
@@ -73,8 +73,8 @@ export default function DeckPageClient({ id }: { id: string }) {
         <li
           className={`px-4 py-2 cursor-pointer ${
             mode === "add"
-              ? "border-b-2 border-blue-500 text-blue-500 font-semibold"
-              : "text-gray-500 hover:text-gray-700"
+              ? "border-b-2 border-[var(--primary-end)] text-[var(--text-primary)] font-semibold"
+              : "text-[var(--text-secondary)]"
           }`}
           onClick={() => setMode("add")}
         >

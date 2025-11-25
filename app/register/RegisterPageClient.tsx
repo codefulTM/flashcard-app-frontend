@@ -193,7 +193,7 @@ export default function RegisterPageClient() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all transform hover:scale-[1.02] ${
+              className={`w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-[var(--primary-start)] hover:bg-[var(--primary-end)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--primary-start)] transition-all transform hover:scale-[1.02] ${
                 isSubmitting ? "opacity-75 cursor-not-allowed" : ""
               }`}
             >
@@ -207,7 +207,7 @@ export default function RegisterPageClient() {
             Already have an account?{" "}
             <Link
               href="/login"
-              className="font-medium text-indigo-600 hover:text-indigo-500 transition-colors"
+              className="font-medium text-[var(--primary-start)] hover:text-[var(--primary-end)] transition-colors"
             >
               Sign in
             </Link>
