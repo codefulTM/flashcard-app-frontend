@@ -11,6 +11,7 @@ import { toast } from "react-hot-toast";
 
 import DeckOptionsDropdown from "./DeckOptionsDropdown";
 import UpdateDeckModal from "./UpdateDeckModal";
+import CustomStudyDialog from "./CustomStudyDialog";
 import { UpdateDeckDto } from "@/app/types/deck";
 import { useRouter } from "next/navigation";
 
@@ -20,6 +21,7 @@ export default function DeckPageClient() {
   const [decks, setDecks] = useState<Deck[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [isCustomStudyDialogOpen, setIsCustomStudyDialogOpen] = useState(false);
   const [selectedDeck, setSelectedDeck] = useState<Deck | null>(null);
   const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
 
@@ -98,90 +100,153 @@ export default function DeckPageClient() {
     setActiveDropdownId(null);
   };
 
+  const handleCustomStudy = (deckId: string) => {
+    const deck = decks.find((d) => d.id === deckId);
+    if (deck) {
+      setSelectedDeck(deck);
+      setIsCustomStudyDialogOpen(true);
+    }
+    setActiveDropdownId(null);
+  };
+
+  const handleCreateCustomStudy = async (days: number) => {
+    if (!user || !selectedDeck) return;
+    try {
+      const customDeck = await deckService.createCustomStudyDeck(
+        selectedDeck.id,
+        user.id,
+        days
+      );
+      toast.success(
+        `Custom study session created with ${customDeck.cards_per_session} card(s)!`
+      );
+      // Navigate to the custom study deck review page
+      router.push(`/deck/${customDeck.id}/review`);
+    } catch (error: any) {
+      console.error("Failed to create custom study session", error);
+      toast.error(
+        error.response?.data?.message || "Failed to create custom study session"
+      );
+    }
+  };
+
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-6 text-[var(--primary-start)]">
-        Your Decks
-      </h1>
-      <div className="flex flex-wrap gap-4">
+    <div className="container mx-auto p-4 max-w-4xl">
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-3xl font-bold text-[var(--primary-start)]">
+          Your Decks
+        </h1>
         <button
-          className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-[var(--primary-start)] hover:text-[var(--primary-start)] transition-colors w-48 h-48"
+          className="flex items-center gap-2 px-4 py-2 bg-[var(--primary-start)] text-white rounded-md hover:bg-[var(--primary-end)] transition-colors"
           onClick={() => setIsModalOpen(true)}
         >
-          <span className="text-5xl">+</span>
-          <span className="mt-2 text-lg">New Deck</span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={2}
+            stroke="currentColor"
+            className="w-5 h-5"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 4.5v15m7.5-7.5h-15"
+            />
+          </svg>
+          New Deck
         </button>
+      </div>
+      <div className="space-y-3">
         {decks.map((deck) => (
           <div
-            className="relative flex flex-col justify-between p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow w-48 h-48"
+            className="relative flex items-center justify-between p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-200"
             key={deck.id}
           >
-            <button
-              className="absolute top-2 right-2 p-1 text-gray-400 hover:text-gray-700 transition-colors"
-              onClick={(e) => {
-                e.stopPropagation();
-                toggleDropdown(deck.id);
-              }}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-6 h-6"
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-3">
+                <h2 className="text-lg font-semibold text-gray-900 truncate">
+                  {deck.name}
+                </h2>
+                {deck.is_custom_study && (
+                  <span className="px-2 py-0.5 text-xs font-medium bg-purple-100 text-purple-700 rounded-full">
+                    Custom Study
+                  </span>
+                )}
+              </div>
+              {deck.description && (
+                <p className="text-sm text-gray-500 mt-1 truncate">
+                  {deck.description}
+                </p>
+              )}
+              <p className="text-sm text-gray-500 mt-1">
+                {deck.next_review_at
+                  ? (() => {
+                      const date = new Date(deck.next_review_at);
+                      const now = new Date();
+                      const diff = date.getTime() - now.getTime();
+
+                      if (diff <= 0)
+                        return (
+                          <span className="text-green-600 font-medium">
+                            Cards due now!
+                          </span>
+                        );
+
+                      const minutes = Math.floor(diff / 60000);
+                      if (minutes < 60) return `Next review in ${minutes}m`;
+
+                      const hours = Math.floor(minutes / 60);
+                      if (hours < 24) return `Next review in ${hours}h`;
+
+                      const days = Math.floor(hours / 24);
+                      return `Next review in ${days}d`;
+                    })()
+                  : "No cards due"}
+              </p>
+            </div>
+            <div className="flex items-center gap-2 ml-4">
+              <button
+                className="px-4 py-2 bg-[var(--primary-start)] text-white rounded-md hover:bg-[var(--primary-end)] transition-colors whitespace-nowrap"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  router.push(`/deck/${deck.id}/review`);
+                }}
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM12.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM18.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
-                />
-              </svg>
-            </button>
-            <DeckOptionsDropdown
-              isOpen={activeDropdownId === deck.id}
-              onClose={() => setActiveDropdownId(null)}
-              onUpdate={() => handleUpdate(deck.id)}
-              onBrowse={() => handleBrowse(deck.id)}
-              onDelete={() => handleDelete(deck.id)}
-            />
-            <h2 className="text-xl font-semibold text-gray-900 truncate">
-              {deck.name}
-            </h2>
-            <p className="text-sm text-gray-500 mt-2">
-              {deck.next_review_at
-                ? (() => {
-                    const date = new Date(deck.next_review_at);
-                    const now = new Date();
-                    const diff = date.getTime() - now.getTime();
-
-                    if (diff <= 0)
-                      return (
-                        <span className="text-green-600 font-medium">
-                          Cards due now!
-                        </span>
-                      );
-
-                    const minutes = Math.floor(diff / 60000);
-                    if (minutes < 60) return `Next review in ${minutes}m`;
-
-                    const hours = Math.floor(minutes / 60);
-                    if (hours < 24) return `Next review in ${hours}h`;
-
-                    const days = Math.floor(hours / 24);
-                    return `Next review in ${days}d`;
-                  })()
-                : "No cards due"}
-            </p>
-            <button
-              className="mt-4 mx-auto w-full px-4 py-2 bg-[var(--primary-start)] text-white rounded-md hover:bg-[var(--primary-end)] transition-colors self-end"
-              onClick={(e) => {
-                e.stopPropagation();
-                router.push(`/deck/${deck.id}/review`);
-              }}
-            >
-              Learn
-            </button>
+                Learn
+              </button>
+              <button
+                className="p-2 text-gray-400 hover:text-gray-700 transition-colors"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleDropdown(deck.id);
+                }}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-6 h-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM12.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM18.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
+                  />
+                </svg>
+              </button>
+              <DeckOptionsDropdown
+                isOpen={activeDropdownId === deck.id}
+                onClose={() => setActiveDropdownId(null)}
+                onUpdate={() => handleUpdate(deck.id)}
+                onBrowse={() => handleBrowse(deck.id)}
+                onDelete={() => handleDelete(deck.id)}
+                onCustomStudy={() => handleCustomStudy(deck.id)}
+                isCustomStudy={deck.is_custom_study}
+              />
+            </div>
           </div>
         ))}
       </div>
@@ -195,6 +260,12 @@ export default function DeckPageClient() {
         onClose={() => setIsUpdateModalOpen(false)}
         onSubmit={handleUpdateDeck}
         deck={selectedDeck}
+      />
+      <CustomStudyDialog
+        isOpen={isCustomStudyDialogOpen}
+        onClose={() => setIsCustomStudyDialogOpen(false)}
+        onSubmit={handleCreateCustomStudy}
+        deckName={selectedDeck?.name || ""}
       />
     </div>
   );

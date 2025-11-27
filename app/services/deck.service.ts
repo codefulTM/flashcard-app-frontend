@@ -30,4 +30,19 @@ export const deckService = {
   async deleteDeck(id: string): Promise<void> {
     await apiClient.delete(`/decks/${id}`);
   },
+
+  async createCustomStudyDeck(
+    deckId: string,
+    userId: string,
+    days: number
+  ): Promise<Deck> {
+    const response = await apiClient.post<Deck>(
+      `/decks/${deckId}/custom-study`,
+      {
+        userId,
+        days,
+      }
+    );
+    return response.data;
+  },
 };

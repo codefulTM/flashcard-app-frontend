@@ -8,6 +8,8 @@ export interface Deck {
   created_at: string;
   updated_at: string;
   next_review_at?: string;
+  is_custom_study?: boolean;
+  source_deck_id?: string;
 }
 
 export interface CreateDeckDto {

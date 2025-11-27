@@ -8,6 +8,8 @@ interface DeckOptionsDropdownProps {
   onUpdate: () => void;
   onDelete: () => void;
   onBrowse: () => void;
+  onCustomStudy: () => void;
+  isCustomStudy?: boolean;
 }
 
 export default function DeckOptionsDropdown({
@@ -16,6 +18,8 @@ export default function DeckOptionsDropdown({
   onUpdate,
   onDelete,
   onBrowse,
+  onCustomStudy,
+  isCustomStudy = false,
 }: DeckOptionsDropdownProps) {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -60,6 +64,24 @@ export default function DeckOptionsDropdown({
             className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
           >
             Browse
+          </button>
+        </li>
+        <li>
+          <button
+            onClick={onCustomStudy}
+            disabled={isCustomStudy}
+            className={`block w-full text-left px-4 py-2 text-sm ${
+              isCustomStudy
+                ? "text-gray-400 cursor-not-allowed"
+                : "text-gray-700 hover:bg-gray-100"
+            }`}
+            title={
+              isCustomStudy
+                ? "Cannot create custom study from a custom study deck"
+                : ""
+            }
+          >
+            Custom Study
           </button>
         </li>
         <li>
