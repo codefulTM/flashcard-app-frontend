@@ -143,7 +143,7 @@ export default function FlashcardReviewer({ deckId }: FlashcardReviewerProps) {
       <div className="flex items-center justify-center h-screen">
         <div className="text-center">
           <svg
-            className="w-24 h-24 mx-auto mb-4 text-gray-400"
+            className="w-24 h-24 mx-auto mb-4 text-[var(--primary-start)]"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -155,12 +155,14 @@ export default function FlashcardReviewer({ deckId }: FlashcardReviewerProps) {
               d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
-          <h3 className="text-2xl font-bold text-white mb-2">All caught up!</h3>
-          <p className="text-white mb-4">
+          <h3 className="text-2xl font-bold text-[var(--text-primary)] mb-2">
+            All caught up!
+          </h3>
+          <p className="text-[var(--text-secondary)] mb-4">
             No flashcards are due for review right now.
           </p>
           {nextReviewDate && (
-            <div className="text-blue-200 text-lg font-medium">
+            <div className="text-[var(--text-primary)] text-lg font-medium">
               {(() => {
                 const date = new Date(nextReviewDate);
                 const now = new Date();
@@ -181,7 +183,7 @@ export default function FlashcardReviewer({ deckId }: FlashcardReviewerProps) {
           )}
           <button
             onClick={() => (window.location.href = `/deck`)}
-            className="mt-6 px-6 py-2 bg-white text-blue-600 rounded-full font-semibold hover:bg-blue-50 transition-colors"
+            className="mt-6 px-6 py-2 bg-[var(--primary-end)] text-[var(--text-primary)] rounded-full font-semibold hover:bg-[var(--primary-start)] transition-colors"
           >
             Back to Decks
           </button>
