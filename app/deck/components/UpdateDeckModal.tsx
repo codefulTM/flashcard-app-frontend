@@ -55,9 +55,9 @@ export default function UpdateDeckModal({
   if (!isOpen || !deck) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-black/50 p-4 md:inset-0 h-screen max-h-full">
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-black/50 backdrop-blur-xl p-4 md:inset-0 h-screen max-h-full">
       <div className="relative w-full max-w-md max-h-full">
-        <div className="relative bg-[var(--background)] rounded-lg shadow dark:bg-[var(--background)]">
+        <div className="relative bg-[var(--background)]/50 rounded-lg shadow backdrop-blur-xl">
           <button
             type="button"
             className="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"

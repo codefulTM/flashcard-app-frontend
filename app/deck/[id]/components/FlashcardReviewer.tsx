@@ -7,6 +7,7 @@ import { flashcardService } from "@/app/services/flashcard.service";
 import { toast } from "react-hot-toast";
 import ReactMarkdown from "react-markdown";
 import { calculateSM2, ratingToQuality } from "@/app/utils/sm2.algorithm";
+import BackButton from "@/app/components/BackButton";
 
 interface FlashcardReviewerProps {
   deckId: string;
@@ -245,6 +246,9 @@ export default function FlashcardReviewer({ deckId }: FlashcardReviewerProps) {
 
   return (
     <div className="h-full flex flex-col p-6">
+      {/* Back Button */}
+      <BackButton href={`/deck`} label="Back to Deck" className="mb-4" />
+
       {/* Progress Bar */}
       <div className="mb-6">
         <div className="flex justify-between items-center mb-2">

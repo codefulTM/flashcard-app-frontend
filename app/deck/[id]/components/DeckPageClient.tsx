@@ -7,6 +7,7 @@ import FlashcardAdder from "./FlashcardAdder";
 import { Flashcard } from "@/app/types/flashcard";
 import { flashcardService } from "@/app/services/flashcard.service";
 import { toast } from "react-hot-toast";
+import BackButton from "@/app/components/BackButton";
 
 export default function DeckPageClient({ id }: { id: string }) {
   const [mode, setMode] = useState<"browse" | "add">("browse");
@@ -59,6 +60,13 @@ export default function DeckPageClient({ id }: { id: string }) {
 
   return (
     <div className="h-screen flex flex-col overflow-hidden">
+      {/* Back Button */}
+      <BackButton
+        href="/deck"
+        label="Back to Decks"
+        className="bg-[var(--background)] border-b border-[var(--primary-end)] px-4 py-3 flex-shrink-0"
+      />
+
       <ul className="flex border-b border-[var(--primary-end)] h-10 z-50 sticky top-0 bg-[var(--primary-start)] flex-shrink-0">
         <li
           className={`px-4 py-2 cursor-pointer ${
