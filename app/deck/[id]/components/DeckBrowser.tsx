@@ -294,7 +294,7 @@ export default function DeckBrowser({
             </button>
 
             {isMenuOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-[var(--primary-start))]/50 rounded-md shadow-lg py-1 z-10 border border-[var(--glass-bg)]">
+              <div className="absolute right-0 mt-2 w-48 bg-[var(--primary-start))]/50 backdrop-blur-xl rounded-md shadow-lg py-1 z-10 border border-[var(--glass-bg)]">
                 <button
                   className="block w-full text-left px-4 py-2 text-sm text-[var(--text-primary)] hover:bg-[var(--glass-bg)]"
                   onClick={handleUpdateClick}
