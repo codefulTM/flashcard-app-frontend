@@ -73,12 +73,12 @@ export const flashcardService = {
 
   async getDueFlashcards(
     deckId: string,
-    limit: number = 20
+    limit?: number
   ): Promise<Flashcard[]> {
     const response = await apiClient.get<Flashcard[]>(
       `/flashcards/deck/${deckId}/due`,
       {
-        params: { limit },
+        params: limit ? { limit } : {},
       }
     );
     return response.data;

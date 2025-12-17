@@ -31,7 +31,8 @@ export default function UpdateDeckModal({
       setValue("name", deck.name);
       setValue("description", deck.description);
       setValue("is_public", deck.is_public);
-      setValue("cards_per_session", deck.cards_per_session);
+      setValue("review_cards_per_session", deck.review_cards_per_session);
+      setValue("learn_cards_per_session", deck.learn_cards_per_session);
     }
   }, [deck, setValue]);
 
@@ -39,9 +40,12 @@ export default function UpdateDeckModal({
     if (!deck) return;
     setSubmitError(null);
     try {
-      // Convert cards_per_session to number if it's a string
-      if (data.cards_per_session) {
-        data.cards_per_session = Number(data.cards_per_session);
+      // Convert to numbers if they're strings
+      if (data.review_cards_per_session) {
+        data.review_cards_per_session = Number(data.review_cards_per_session);
+      }
+      if (data.learn_cards_per_session) {
+        data.learn_cards_per_session = Number(data.learn_cards_per_session);
       }
       await onSubmit(deck.id, data);
       reset();
@@ -127,17 +131,32 @@ export default function UpdateDeckModal({
               </div>
               <div>
                 <label
-                  htmlFor="cards_per_session"
+                  htmlFor="review_cards_per_session"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                 >
-                  Cards per session
+                  Review cards per session
                 </label>
                 <input
                   type="number"
-                  id="cards_per_session"
+                  id="review_cards_per_session"
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
                   placeholder="20"
-                  {...register("cards_per_session", { min: 1 })}
+                  {...register("review_cards_per_session", { min: 1 })}
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="learn_cards_per_session"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >
+                  Learn cards per session
+                </label>
+                <input
+                  type="number"
+                  id="learn_cards_per_session"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                  placeholder="10"
+                  {...register("learn_cards_per_session", { min: 1 })}
                 />
               </div>
               <div className="flex items-start">

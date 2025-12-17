@@ -117,8 +117,9 @@ export default function DeckPageClient() {
         user.id,
         days
       );
+      const totalCards = customDeck.review_cards_per_session + customDeck.learn_cards_per_session;
       toast.success(
-        `Custom study session created with ${customDeck.cards_per_session} card(s)!`
+        `Custom study session created! ${customDeck.review_cards_per_session} review card(s) and ${customDeck.learn_cards_per_session} new card(s) (${totalCards} total)`
       );
       // Navigate to the custom study deck review page
       router.push(`/deck/${customDeck.id}/review`);
@@ -182,26 +183,26 @@ export default function DeckPageClient() {
               <p className="text-sm text-gray-500 mt-1">
                 {deck.next_review_at
                   ? (() => {
-                      const date = new Date(deck.next_review_at);
-                      const now = new Date();
-                      const diff = date.getTime() - now.getTime();
+                    const date = new Date(deck.next_review_at);
+                    const now = new Date();
+                    const diff = date.getTime() - now.getTime();
 
-                      if (diff <= 0)
-                        return (
-                          <span className="text-green-600 font-medium">
-                            Cards due now!
-                          </span>
-                        );
+                    if (diff <= 0)
+                      return (
+                        <span className="text-green-600 font-medium">
+                          Cards due now!
+                        </span>
+                      );
 
-                      const minutes = Math.floor(diff / 60000);
-                      if (minutes < 60) return `Next review in ${minutes}m`;
+                    const minutes = Math.floor(diff / 60000);
+                    if (minutes < 60) return `Next review in ${minutes}m`;
 
-                      const hours = Math.floor(minutes / 60);
-                      if (hours < 24) return `Next review in ${hours}h`;
+                    const hours = Math.floor(minutes / 60);
+                    if (hours < 24) return `Next review in ${hours}h`;
 
-                      const days = Math.floor(hours / 24);
-                      return `Next review in ${days}d`;
-                    })()
+                    const days = Math.floor(hours / 24);
+                    return `Next review in ${days}d`;
+                  })()
                   : "No cards due"}
               </p>
             </div>

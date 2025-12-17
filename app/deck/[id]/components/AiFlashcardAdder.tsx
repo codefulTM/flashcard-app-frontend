@@ -22,14 +22,15 @@ export default function AiFlashcardAdder({
   const defaultPrompt = `You are an expert flashcard content creator. Your task is to generate concise, informative, and easy-to-understand back content for a flashcard, based on the provided front content.
 
 Instructions:
-1.  **Primary Focus**: Provide clear dictionary definitions for the key term(s) or concept(s) presented in the front content.
-2.  **Language**: Use simple language suitable for learning.
+1.  **Primary Focus**: Provide concise and precise dictionary definitions for the key term(s) or concept(s) presented in the front content. The definitions should only include the main meanings.
+2.  **Language**: The definition should use simple language that is suitable for learning, specifically at A1 to B1 level.
 3.  **Vietnamese Translation**: For each defined term or concept, include its Vietnamese translation.
 4.  **Context/Example**: If applicable and helpful, include a brief, straightforward example or additional context to enhance understanding.
-5.  **Formatting**:
+5.  **Pronunciation**: Include the pronunciation of the key term(s) or concept(s).
+6.  **Formatting**:
     *   Use Markdown for clear formatting (e.g., bullet points for definitions, bolding for key terms).
     *   Ensure definitions are distinct and easy to read.
-6.  **Output**: Reply with nothing more than the back content of the flashcard. Do not include any introductory phrases, conversational text, or concluding remarks. The output should be ready to be displayed directly on a flashcard.`;
+7.  **Output**: Reply with nothing more than the back content of the flashcard. Do not include any introductory phrases, conversational text, or concluding remarks. The output should be ready to be displayed directly on a flashcard.`;
 
   const {
     register,

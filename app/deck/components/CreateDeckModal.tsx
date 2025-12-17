@@ -108,6 +108,36 @@ export default function CreateDeckModal({
                   {...register("description")}
                 ></textarea>
               </div>
+              <div>
+                <label
+                  htmlFor="review_cards_per_session"
+                  className="block mb-2 text-sm font-medium text-[var(--text-primary)]"
+                >
+                  Review cards per session (Optional)
+                </label>
+                <input
+                  type="number"
+                  id="review_cards_per_session"
+                  className="bg-[var(--glass-bg)] border border-[var(--glass-border)] text-[var(--text-primary)] text-sm rounded-lg focus:ring-[var(--primary-start)] focus:border-[var(--primary-start)] block w-full p-2.5"
+                  placeholder="20"
+                  {...register("review_cards_per_session", { min: 1 })}
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="learn_cards_per_session"
+                  className="block mb-2 text-sm font-medium text-[var(--text-primary)]"
+                >
+                  Learn cards per session (Optional)
+                </label>
+                <input
+                  type="number"
+                  id="learn_cards_per_session"
+                  className="bg-[var(--glass-bg)] border border-[var(--glass-border)] text-[var(--text-primary)] text-sm rounded-lg focus:ring-[var(--primary-start)] focus:border-[var(--primary-start)] block w-full p-2.5"
+                  placeholder="10"
+                  {...register("learn_cards_per_session", { min: 1 })}
+                />
+              </div>
               <div className="flex items-start">
                 <div className="flex items-center h-5">
                   <input
