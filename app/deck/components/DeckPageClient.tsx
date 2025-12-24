@@ -187,12 +187,43 @@ export default function DeckPageClient() {
                     const now = new Date();
                     const diff = date.getTime() - now.getTime();
 
-                    if (diff <= 0)
+                    if (diff <= 0) {
+                      try {
+                        const storageKey = `review_${deck.id}`;
+                        const stored = localStorage.getItem(storageKey);
+                        if (stored) {
+                          let parsed = JSON.parse(stored);
+                          const reviewDate = new Date(parsed.reviewDate);
+                          reviewDate.setHours(0, 0, 0, 0);
+                          const today = new Date();
+                          today.setHours(0, 0, 0, 0);
+                          if (reviewDate.getTime() !== today.getTime()) {
+                            let dailyStats = { reviewDate: new Date().toISOString(), reviewedCount: 0, learnedCount: 0 };
+                            localStorage.setItem(storageKey, JSON.stringify(dailyStats));
+                            parsed = dailyStats; 
+                          }
+                          const maxReview = deck.review_cards_per_session ?? 10;
+                          const maxLearn = deck.learn_cards_per_session ?? 20;
+                          const reachedReview = (parsed.reviewedCount || 0) >= maxReview;
+                          const reachedLearn = (parsed.learnedCount || 0) >= maxLearn;
+                          if (reachedReview && reachedLearn) {
+                            return (
+                              <span className="text-gray-500 font-medium">
+                                No cards due
+                              </span>
+                            );
+                          }
+                        }
+                      } catch (e) {
+                        // ignore parse/localStorage errors and fall back to default
+                      }
+
                       return (
                         <span className="text-green-600 font-medium">
                           Cards due now!
                         </span>
                       );
+                    }
 
                     const minutes = Math.floor(diff / 60000);
                     if (minutes < 60) return `Next review in ${minutes}m`;

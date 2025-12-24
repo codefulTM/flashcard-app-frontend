@@ -33,6 +33,9 @@ export default function FlashcardReviewer({ deckId }: FlashcardReviewerProps) {
   });
   const [nextReviewDate, setNextReviewDate] = useState<string | null>(null);
 
+  // Session-only undo stack (stores snapshots before a review action)
+  const [undoStack, setUndoStack] = useState<any[]>([]);
+
   useEffect(() => {
     loadDueFlashcards();
   }, [deckId]);
@@ -136,6 +139,23 @@ export default function FlashcardReviewer({ deckId }: FlashcardReviewerProps) {
     const currentCard = flashcards[currentIndex];
     const timeTaken = Date.now() - reviewStartTime;
 
+    // push snapshot for possible undo (session-only)
+    const storageKey = `review_${deckId}`;
+    const storedData = localStorage.getItem(storageKey);
+    const dailyStatsSnapshot = storedData ? JSON.parse(storedData) : null;
+    setUndoStack((s) => [
+      ...s,
+      {
+        flashcards: [...flashcards],
+        currentIndex,
+        showAnswer,
+        reviewStartTime,
+        stats: { ...stats },
+        cardTypeStats: { ...cardTypeStats },
+        dailyStatsSnapshot,
+      },
+    ]);
+
     try {
       await flashcardService.reviewFlashcard(currentCard.id, {
         rating,
@@ -143,20 +163,20 @@ export default function FlashcardReviewer({ deckId }: FlashcardReviewerProps) {
       });
 
       // Update localStorage counters
-      const storageKey = `review_${deckId}`;
-      const storedData = localStorage.getItem(storageKey);
-      
-      if (storedData) {
-        const dailyStats = JSON.parse(storedData);
-        
+      const storageKey2 = `review_${deckId}`;
+      const storedData2 = localStorage.getItem(storageKey2);
+
+      if (storedData2) {
+        const dailyStats = JSON.parse(storedData2);
+
         // Update appropriate counter based on card type
         if (currentCard.repetitions > 0) {
           dailyStats.reviewedCount++;
         } else {
           dailyStats.learnedCount++;
         }
-        
-        localStorage.setItem(storageKey, JSON.stringify(dailyStats));
+
+        localStorage.setItem(storageKey2, JSON.stringify(dailyStats));
       }
 
       // Update stats
@@ -178,6 +198,38 @@ export default function FlashcardReviewer({ deckId }: FlashcardReviewerProps) {
     } catch (error) {
       console.error("Failed to review flashcard", error);
       toast.error("Failed to save review");
+    }
+  };
+
+  // Undo last review: call backend to revert and restore UI/localStorage snapshot
+  const handleUndo = async () => {
+    const last = undoStack[undoStack.length - 1];
+    if (!last) return;
+
+    // Identify the reviewed card (index before the review was applied)
+    const reviewedIndex = last.currentIndex;
+    const reviewedCard = last.flashcards[reviewedIndex];
+
+    try {
+      if (reviewedCard && reviewedCard.id) {
+        await flashcardService.undoReview(reviewedCard.id);
+      }
+
+      // Restore UI state and localStorage snapshot
+      setFlashcards(last.flashcards);
+      setCurrentIndex(last.currentIndex);
+      setShowAnswer(last.showAnswer);
+      setReviewStartTime(last.reviewStartTime);
+      setStats(last.stats);
+      setCardTypeStats(last.cardTypeStats);
+      if (last.dailyStatsSnapshot) {
+        localStorage.setItem(`review_${deckId}`, JSON.stringify(last.dailyStatsSnapshot));
+      }
+      setUndoStack((s) => s.slice(0, -1));
+      toast.success("Undid last review");
+    } catch (error) {
+      console.error("Failed to undo review", error);
+      toast.error("Failed to undo review on server");
     }
   };
 
@@ -323,9 +375,23 @@ export default function FlashcardReviewer({ deckId }: FlashcardReviewerProps) {
 
   return (
     <div className="h-full flex flex-col p-6">
-      {/* Back Button */}
-      <BackButton href={`/deck`} label="Back to Deck" className="mb-4" />
+      <div className="flex items-center mb-4">
+        {/* Back Button */}
+        <BackButton href={`/deck`} label="Back to Deck" className="mr-4" />
 
+        {/* Undo button shown when there is a session snapshot */}
+        {undoStack.length > 0 && (
+          <div className="ml-auto z-50">
+              <button
+                onClick={handleUndo}
+                className="py-2 px-2 bg-[var(--primary-start)] text-[var(--text-primary)] rounded-md shadow-sm hover:bg-[var(--primary-end)] transition-colors"
+              >
+                Undo
+              </button>
+            </div>
+        )}
+      </div>
+      
       {/* Progress Bar */}
       <div className="mb-6">
         <div className="flex justify-between items-center mb-2">

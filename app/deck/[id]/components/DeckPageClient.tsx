@@ -103,7 +103,7 @@ export default function DeckPageClient({ id }: { id: string }) {
           />
         )}
         {mode === "add" && (
-          <FlashcardAdder deckId={id} onAddFlashcard={handleAddFlashcard} />
+          <FlashcardAdder deckId={id} onAddFlashcard={handleAddFlashcard} onUpdateFlashcard={handleFlashcardUpdate} />
         )}
       </div>
     </div>

@@ -6,9 +6,11 @@ import AiFlashcardAdder from "./AiFlashcardAdder";
 export default function FlashcardAdder({
   deckId,
   onAddFlashcard,
+  onUpdateFlashcard,
 }: {
   deckId: string;
   onAddFlashcard: (flashcard: Flashcard) => void;
+  onUpdateFlashcard?: (flashcard: Flashcard) => void;
 }) {
   const [mode, setMode] = useState<"manual" | "ai">("manual");
   return (
@@ -43,7 +45,7 @@ export default function FlashcardAdder({
           />
         )}
         {mode === "ai" && (
-          <AiFlashcardAdder deckId={deckId} onAddFlashcard={onAddFlashcard} />
+          <AiFlashcardAdder deckId={deckId} onAddFlashcard={onAddFlashcard} onUpdateFlashcard={onUpdateFlashcard} />
         )}
       </div>
     </div>

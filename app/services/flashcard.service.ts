@@ -60,6 +60,11 @@ export const flashcardService = {
     return response.data;
   },
 
+  async regenerateFlashcard(id: string, prompt?: string): Promise<Flashcard> {
+    const response = await apiClient.post<Flashcard>(`/flashcards/${id}/regenerate`, { prompt });
+    return response.data;
+  },
+
   async reviewFlashcard(
     id: string,
     data: ReviewFlashcardDto
@@ -68,6 +73,11 @@ export const flashcardService = {
       `/flashcards/${id}/review`,
       data
     );
+    return response.data;
+  },
+
+  async undoReview(id: string): Promise<Flashcard> {
+    const response = await apiClient.post<Flashcard>(`/flashcards/${id}/undo-review`);
     return response.data;
   },
 

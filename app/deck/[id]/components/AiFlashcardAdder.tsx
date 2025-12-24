@@ -1,4 +1,5 @@
 import { Flashcard } from "@/app/types/flashcard";
+import { useState } from "react";
 import { useForm, useFieldArray, SubmitHandler } from "react-hook-form";
 import { flashcardService } from "@/app/services/flashcard.service";
 import { toast } from "react-hot-toast";
@@ -15,28 +16,45 @@ interface FormValues {
   }[];
 }
 
+interface AiFlashcardAdderPropsWithUpdate extends AiFlashcardAdderProps {
+  onUpdateFlashcard?: (flashcard: Flashcard) => void;
+}
+
 export default function AiFlashcardAdder({
   deckId,
   onAddFlashcard,
-}: AiFlashcardAdderProps) {
-  const defaultPrompt = `You are an expert flashcard content creator. Your task is to generate concise, informative, and easy-to-understand back content for a flashcard, based on the provided front content.
+  onUpdateFlashcard,
+}: AiFlashcardAdderPropsWithUpdate) {
+  const defaultPrompt = `You are an expert dictionary editor. IMPORTANT: Use only Vietnamese (Tiếng Việt) or English in your entire output. Do not use any other languages. The output must contain only the requested dictionary entry content and may include Vietnamese translations where specified — do not add any other languages or extra commentary.
 
-Instructions:
-1.  **Primary Focus**: Provide concise and precise dictionary definitions for the key term(s) or concept(s) presented in the front content. The definitions should only include the main meanings.
-2.  **Language**: The definition should use simple language that is suitable for learning, specifically at A1 to B1 level.
-3.  **Vietnamese Translation**: For each defined term or concept, include its Vietnamese translation.
-4.  **Context/Example**: If applicable and helpful, include a brief, straightforward example or additional context to enhance understanding.
-5.  **Pronunciation**: Include the pronunciation of the key term(s) or concept(s).
-6.  **Formatting**:
-    *   Use Markdown for clear formatting (e.g., bullet points for definitions, bolding for key terms).
-    *   Ensure definitions are distinct and easy to read.
-7.  **Output**: Reply with nothing more than the back content of the flashcard. Do not include any introductory phrases, conversational text, or concluding remarks. The output should be ready to be displayed directly on a flashcard.`;
+Given a single English headword (the "Front"), produce a dictionary-style entry as the flashcard back. Output ONLY the entry in Markdown with the exact sections below and no extra commentary.
+
+If the headword has multiple senses/definitions, output a numbered list of senses (1., 2., 3., ...). Include at most 4 main senses — if the word has more than four senses, include only the four most common/main senses and omit rarer or archaic senses. EACH numbered sense must be its own section and MUST include all required subsections listed below (i.e., repeat Part of speech, Pronunciation, Countability, Definition, Vietnamese translation, Examples, Common collocations, Usage notes, Synonyms/Antonyms for that particular sense). Do NOT combine multiple senses into a single block.
+
+Required subsections for each sense (produce all when possible):
+- **Word:** the headword being defined
+- **Sense:** numbered sense label (e.g., 1.)
+- **Part of speech:** e.g., noun, verb, adjective, adverb
+- **Pronunciation:** IPA form
+- **Countability:** state whether the noun is "countable", "uncountable", or "both/depends" (if applicable)
+- **Definition:** a concise learner-friendly definition for this sense
+- **Vietnamese translation:** natural translation for this specific sense (provide this subsection in Vietnamese)
+- **Examples:** at least 2 example sentences for this sense (label Example 1, Example 2...)
+- **Common collocations:** 2–4 collocations or phrases specific to this sense
+- **Usage notes:** short notes about register, formality, typical contexts (optional)
+- **Synonyms / Antonyms:** short lists if applicable
+
+Formatting rules:
+- Use Markdown headings and numbered lists for senses; use sub-bullets where appropriate.
+- Keep language simple and learner-friendly (A1–B1 level where possible).
+- Do not include any extra text, explanation, or metadata outside the sections above.`;
 
   const {
     register,
     control,
     handleSubmit,
     reset,
+    getValues,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     defaultValues: {
@@ -62,14 +80,49 @@ Instructions:
 
       const newFlashcards = await Promise.all(promises);
       newFlashcards.forEach((card) => onAddFlashcard(card));
+      setPreviews(newFlashcards);
 
       toast.success(
         `Successfully generated and added ${newFlashcards.length} flashcards!`
       );
-      reset({ prompt: defaultPrompt, flashcards: [{ front_content: "" }] });
+      // reset({ prompt: defaultPrompt, flashcards: [{ front_content: "" }] });
     } catch (error) {
       console.error("Failed to generate flashcards", error);
       toast.error("Failed to generate some flashcards. Please try again.");
+    }
+  };
+
+  const [previews, setPreviews] = useState<Flashcard[]>([]);
+  const [regenerating, setRegenerating] = useState<Record<number, boolean>>({});
+
+  const handleRegenerate = async (index: number, front: string) => {
+    try {
+      setRegenerating((s) => ({ ...s, [index]: true }));
+      const prompt = getValues().prompt;
+      // If preview has an id => update existing flashcard, otherwise create new
+      const existing = previews[index];
+      if (existing && existing.id) {
+        const updated = await flashcardService.regenerateFlashcard(existing.id, prompt);
+        setPreviews((prev) => {
+          const copy = [...prev];
+          copy[index] = updated;
+          return copy;
+        });
+        if (onUpdateFlashcard) onUpdateFlashcard(updated);
+      } else {
+        const newCard = await flashcardService.generateFlashcard(deckId, front, prompt);
+        setPreviews((prev) => {
+          const copy = [...prev];
+          copy[index] = newCard;
+          return copy;
+        });
+        onAddFlashcard(newCard);
+      }
+    } catch (err) {
+      console.error("Regenerate failed", err);
+      toast.error("Failed to regenerate flashcard. Please try again.");
+    } finally {
+      setRegenerating((s) => ({ ...s, [index]: false }));
     }
   };
 
@@ -207,6 +260,36 @@ Instructions:
               <div className="mt-2 text-sm text-gray-500 italic">
                 * AI will automatically generate the back content for this card.
               </div>
+              {previews[index] && (
+                <div className="mt-4 p-4 bg-gray-50 rounded-md border border-gray-200">
+                  <div className="text-sm text-gray-600 mb-1">Generated Preview</div>
+                  {regenerating[index] ? (
+                    <div className="flex items-center justify-center py-8">
+                      <svg className="animate-spin h-6 w-6 text-gray-600" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                      </svg>
+                    </div>
+                  ) : (
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1">
+                        <div className="text-sm text-gray-600">Back (generated):</div>
+                        <pre className="whitespace-pre-wrap text-sm text-gray-800">{previews[index]?.back_content}</pre>
+                      </div>
+                      <div className="flex-shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => handleRegenerate(index, previews[index]?.front_content || "")}
+                          disabled={!!regenerating[index]}
+                          className="ml-4 px-3 py-1 bg-white border rounded text-sm hover:bg-gray-100 disabled:opacity-50"
+                        >
+                          Regenerate
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -234,6 +317,7 @@ Instructions:
             </svg>
           </button>
         </div>
+        {/* Previews are rendered inline per card above. */}
       </form>
     </div>
   );
